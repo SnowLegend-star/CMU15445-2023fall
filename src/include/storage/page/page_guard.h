@@ -17,15 +17,11 @@ class BasicPageGuard {
   BasicPageGuard(const BasicPageGuard &) = delete;
   auto operator=(const BasicPageGuard &) -> BasicPageGuard & = delete;
 
-  /** TODO(P2): Add implementation
+  /**
+   * @brief 移动构造函数
    *
-   * @brief Move constructor for BasicPageGuard
-   *
-   * When you call BasicPageGuard(std::move(other_guard)), you
-   * expect that the new guard will behave exactly like the other
-   * one. In addition, the old page guard should not be usable. For
-   * example, it should not be possible to call .Drop() on both page
-   * guards and have the pin count decrease by 2.
+   * 当调用 BasicPageGuard(std::move(other_guard)) 时，预期新的保护器将与其他保护器行为相同。
+   * 此外，旧的页面保护器不应该再可用。例如，不应该同时在两个页面保护器上调用 .Drop() 并使 pin 计数减少 2。
    */
   BasicPageGuard(BasicPageGuard &&that) noexcept;
 
@@ -61,25 +57,21 @@ class BasicPageGuard {
    */
   ~BasicPageGuard();
 
-  /** TODO(P2): Add implementation
+  /**
+   * @brief 将 BasicPageGuard 升级为 ReadPageGuard
    *
-   * @brief Upgrade a BasicPageGuard to a ReadPageGuard
+   * 在升级期间，受保护的页面不会从缓冲池中驱逐，并且在调用此函数后，应使基本页面保护器无效。
    *
-   * The protected page is not evicted from the buffer pool during the upgrade,
-   * and the basic page guard should be made invalid after calling this function.
-   *
-   * @return an upgraded ReadPageGuard
+   * @return 升级后的 ReadPageGuard
    */
   auto UpgradeRead() -> ReadPageGuard;
 
-  /** TODO(P2): Add implementation
+  /**
+   * @brief 将 BasicPageGuard 升级为 WritePageGuard
    *
-   * @brief Upgrade a BasicPageGuard to a WritePageGuard
+   * 在升级期间，受保护的页面不会从缓冲池中驱逐，并且在调用此函数后，应使基本页面保护器无效。
    *
-   * The protected page is not evicted from the buffer pool during the upgrade,
-   * and the basic page guard should be made invalid after calling this function.
-   *
-   * @return an upgraded WritePageGuard
+   * @return 升级后的 WritePageGuard
    */
   auto UpgradeWrite() -> WritePageGuard;
 
@@ -106,11 +98,12 @@ class BasicPageGuard {
   friend class ReadPageGuard;
   friend class WritePageGuard;
 
-  [[maybe_unused]] BufferPoolManager *bpm_{nullptr};
+  BufferPoolManager *bpm_{nullptr};
   Page *page_{nullptr};
   bool is_dirty_{false};
 };
 
+// 基于basic的ReadPageGuard
 class ReadPageGuard {
  public:
   ReadPageGuard() = default;
@@ -171,6 +164,7 @@ class ReadPageGuard {
   BasicPageGuard guard_;
 };
 
+// 基于basic的WritePageGuard
 class WritePageGuard {
  public:
   WritePageGuard() = default;

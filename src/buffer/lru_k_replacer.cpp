@@ -11,6 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "buffer/lru_k_replacer.h"
+#include <iostream>
 #include <memory>
 #include <utility>
 #include "common/macros.h"
@@ -60,6 +61,9 @@ auto LRUKReplacer::Evict(frame_id_t *frame_id) -> bool {
     current_size_--;
     evict_node_ptr->history_.clear();
     node_store_.erase(*frame_id);
+    std::cout << "frame " << *frame_id << " 被成功evict" << std::endl;
+  } else {
+    std::cout << "当前没有可以evict的frame了!" << std::endl;
   }
 
   return success_evict;
