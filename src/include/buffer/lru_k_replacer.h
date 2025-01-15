@@ -1,161 +1,131 @@
-//===----------------------------------------------------------------------===//
-//
-//                         BusTub
-//
-// lru_k_replacer.h
-//
-// Identification: src/include/buffer/lru_k_replacer.h
-//
-// Copyright (c) 2015-2022, Carnegie Mellon University Database Group
-//
-//===----------------------------------------------------------------------===//
-
 #pragma once
 
-#include <limits>
 #include <list>
 #include <mutex>  // NOLINT
 #include <unordered_map>
-#include <vector>
 
 #include "common/config.h"
 #include "common/macros.h"
 
 namespace bustub {
 
+// 访问类型枚举，用于表示对页的访问类型
 enum class AccessType { Unknown = 0, Lookup, Scan, Index };
 
+// LRUK节点类
 class LRUKNode {
  private:
-  /** History of last seen K timestamps of this page. Least recent timestamp stored in front. */
-  // Remove maybe_unused if you start using them. Feel free to change the member variables as you want.
+  /** 页面的最近K次访问时间戳历史记录。最早的时间戳存储在最前面。 */
+  // 如果开始使用，请删除maybe_unused。随意更改成员变量。
 
-  [[maybe_unused]] std::list<size_t> history_;
-  [[maybe_unused]] size_t k_;
-  [[maybe_unused]] frame_id_t fid_;
-  [[maybe_unused]] bool is_evictable_{false};
+ public:
+  std::list<size_t> history_;  // 存储最近的K个时间戳历史记录
+  size_t k_;                   // K值，表示最近访问的历史记录数量
+  frame_id_t fid_;             // 框架ID，表示页面ID
+  bool is_evictable_{false};   // 是否可淘汰
+
+  auto GetBackKTimeStamp() { return history_.front(); }   // 获取最早的K个时间戳
+  auto GetLatestTimeStamp() { return history_.front(); }  // 获取最新的时间戳
 };
 
-/**
- * LRUKReplacer implements the LRU-k replacement policy.
- *
- * The LRU-k algorithm evicts a frame whose backward k-distance is maximum
- * of all frames. Backward k-distance is computed as the difference in time between
- * current timestamp and the timestamp of kth previous access.
- *
- * A frame with less than k historical references is given
- * +inf as its backward k-distance. When multiple frames have +inf backward k-distance,
- * classical LRU algorithm is used to choose victim.
- */
+// LRUK替换器类，实现LRU-k替换策略
 class LRUKReplacer {
  public:
   /**
    *
-   * TODO(P1): Add implementation
+   * TODO(P1): 添加实现
    *
-   * @brief a new LRUKReplacer.
-   * @param num_frames the maximum number of frames the LRUReplacer will be required to store
+   * @brief 创建一个新的LRUK替换器。
+   * @param num_frames LRUReplacer需要存储的最大框架数
    */
   explicit LRUKReplacer(size_t num_frames, size_t k);
 
-  DISALLOW_COPY_AND_MOVE(LRUKReplacer);
+  DISALLOW_COPY_AND_MOVE(LRUKReplacer);  // 禁止复制和移动
 
   /**
-   * TODO(P1): Add implementation
+   * TODO(P1): 添加实现
    *
-   * @brief Destroys the LRUReplacer.
+   * @brief 销毁LRUReplacer。
    */
   ~LRUKReplacer() = default;
 
   /**
-   * TODO(P1): Add implementation
+   * TODO(P1): 添加实现
    *
-   * @brief Find the frame with largest backward k-distance and evict that frame. Only frames
-   * that are marked as 'evictable' are candidates for eviction.
+   * @brief 查找具有最大后向K距离的框架，并驱逐该框架。只有被标记为“可淘汰”的框架才是淘汰的候选对象。
    *
-   * A frame with less than k historical references is given +inf as its backward k-distance.
-   * If multiple frames have inf backward k-distance, then evict frame with earliest timestamp
-   * based on LRU.
+   * 具有少于K个历史引用的框架的后向K距离被赋予+inf。如果多个框架具有+inf的后向K距离，则根据LRU选择最早时间戳的框架作为受害者。
    *
-   * Successful eviction of a frame should decrement the size of replacer and remove the frame's
-   * access history.
+   * 成功驱逐框架应该减少替换器的大小并删除框架的访问历史。
    *
-   * @param[out] frame_id id of frame that is evicted.
-   * @return true if a frame is evicted successfully, false if no frames can be evicted.
+   * @param[out] frame_id 被驱逐的框架的ID。
+   * @return 如果成功驱逐了一个框架，则返回true；如果没有框架可以被驱逐，则返回false。
    */
-  auto Evict(frame_id_t *frame_id) -> bool;
+  auto Evict(frame_id_t *frame_id) -> bool;  //找出可以替换的物理页ID并赋值给参数，若没有可以替换的则返回false
 
   /**
-   * TODO(P1): Add implementation
+   * TODO(P1): 添加实现
    *
-   * @brief Record the event that the given frame id is accessed at current timestamp.
-   * Create a new entry for access history if frame id has not been seen before.
+   * @brief 记录给定框架ID在当前时间戳的访问事件。
+   * 如果框架ID无效（即大于replacer_size_），则抛出异常。如果框架ID无效，也可以使用BUSTUB_ASSERT终止进程。
    *
-   * If frame id is invalid (ie. larger than replacer_size_), throw an exception. You can
-   * also use BUSTUB_ASSERT to abort the process if frame id is invalid.
-   *
-   * @param frame_id id of frame that received a new access.
-   * @param access_type type of access that was received. This parameter is only needed for
-   * leaderboard tests.
+   * @param frame_id 接收新访问的框架的ID。
+   * @param access_type 接收的访问类型。此参数仅在排行榜测试中需要。
    */
-  void RecordAccess(frame_id_t frame_id, AccessType access_type = AccessType::Unknown);
+  void RecordAccess(
+      frame_id_t frame_id,
+      AccessType access_type =
+          AccessType::Unknown);  //记录给定物理页访问的时间戳，若不存在与物理页映射的虚拟页那么创建然后再加入
 
   /**
-   * TODO(P1): Add implementation
+   * TODO(P1): 添加实现
    *
-   * @brief Toggle whether a frame is evictable or non-evictable. This function also
-   * controls replacer's size. Note that size is equal to number of evictable entries.
+   * @brief 切换框架是否可淘汰。此函数还控制替换器的大小。注意，大小等于可淘汰条目的数量。
    *
-   * If a frame was previously evictable and is to be set to non-evictable, then size should
-   * decrement. If a frame was previously non-evictable and is to be set to evictable,
-   * then size should increment.
+   * 如果框架之前是可淘汰的，并且要设置为不可淘汰，则大小应减少。如果框架之前不可淘汰，并且要设置为可淘汰，则大小应增加。
    *
-   * If frame id is invalid, throw an exception or abort the process.
+   * 如果框架ID无效，则抛出异常或终止进程。
    *
-   * For other scenarios, this function should terminate without modifying anything.
+   * 对于其他情况，此函数应该在不修改任何内容的情况下终止。
    *
-   * @param frame_id id of frame whose 'evictable' status will be modified
-   * @param set_evictable whether the given frame is evictable or not
+   * @param frame_id 要修改其“可淘汰”状态的框架的ID
+   * @param set_evictable 指定的框架是否可淘汰
    */
-  void SetEvictable(frame_id_t frame_id, bool set_evictable);
+  void SetEvictable(frame_id_t frame_id, bool set_evictable);  //设置物理页ID 的可替换为 set_evictable
 
   /**
-   * TODO(P1): Add implementation
+   * TODO(P1): 添加实现
    *
-   * @brief Remove an evictable frame from replacer, along with its access history.
-   * This function should also decrement replacer's size if removal is successful.
+   * @brief 从替换器中移除一个可淘汰框架，以及其访问历史记录。
+   * 如果移除成功，此函数还应减少替换器的大小。
    *
-   * Note that this is different from evicting a frame, which always remove the frame
-   * with largest backward k-distance. This function removes specified frame id,
-   * no matter what its backward k-distance is.
+   * 请注意，这与驱逐框架不同，后者始终删除具有最大后向K距离的框架。此函数删除指定的框架ID，无论其后向K距离如何。
    *
-   * If Remove is called on a non-evictable frame, throw an exception or abort the
-   * process.
+   * 如果在不可淘汰的框架上调用Remove，则抛出异常或终止进程。
    *
-   * If specified frame is not found, directly return from this function.
+   * 如果未找到指定的框架，则直接从此函数返回。
    *
-   * @param frame_id id of frame to be removed
+   * @param frame_id 要移除的框架的ID
    */
   void Remove(frame_id_t frame_id);
 
   /**
-   * TODO(P1): Add implementation
+   * TODO(P1): 添加实现
    *
-   * @brief Return replacer's size, which tracks the number of evictable frames.
+   * @brief 返回替换器的大小，即跟踪可淘汰框架的数量。
    *
    * @return size_t
    */
   auto Size() -> size_t;
 
  private:
-  // TODO(student): implement me! You can replace these member variables as you like.
-  // Remove maybe_unused if you start using them.
-  [[maybe_unused]] std::unordered_map<frame_id_t, LRUKNode> node_store_;
-  [[maybe_unused]] size_t current_timestamp_{0};
-  [[maybe_unused]] size_t curr_size_{0};
-  [[maybe_unused]] size_t replacer_size_;
-  [[maybe_unused]] size_t k_;
-  [[maybe_unused]] std::mutex latch_;
+  // 学生应该实现这些成员变量！如果开始使用，请删除maybe_unused。
+  std::unordered_map<frame_id_t, LRUKNode> node_store_;  // 存储LRUK节点的哈希表
+  size_t current_timestamp_{0};                          // 当前时间戳
+  size_t current_size_{0};                               // 当前大小
+  size_t replacer_size_;                                 // 替换器大小
+  size_t k_;                                             // k值
+  std::mutex latch_;                                     // 互斥量，用于保护并发访问
 };
 
 }  // namespace bustub
