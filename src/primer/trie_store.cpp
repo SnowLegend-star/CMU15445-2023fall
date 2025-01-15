@@ -1,8 +1,24 @@
+//===----------------------------------------------------------------------===//
+//
+//                         BusTub
+//
+// trie_store.cpp
+//
+// Identification: src/primer/trie_store.cpp
+//
+// Copyright (c) 2015-2025, Carnegie Mellon University Database Group
+//
+//===----------------------------------------------------------------------===//
+
 #include "primer/trie_store.h"
 #include "common/exception.h"
 
 namespace bustub {
 
+/**
+ * @brief This function returns a ValueGuard object that holds a reference to the value in the trie. If
+ * the key does not exist in the trie, it will return std::nullopt.
+ */
 template <class T>
 auto TrieStore::Get(std::string_view key) -> std::optional<ValueGuard<T>> {
   // Pseudo-code:
@@ -11,20 +27,40 @@ auto TrieStore::Get(std::string_view key) -> std::optional<ValueGuard<T>> {
   // (2) Lookup the value in the trie.
   // (3) If the value is found, return a ValueGuard object that holds a reference to the value and the
   //     root. Otherwise, return std::nullopt.
-  throw NotImplementedException("TrieStore::Get is not implemented.");
+  root_lock_.lock();
+  auto cur_root = root_;
+  root_lock_.unlock();
+  auto value = cur_root.Get<T>(key);
+  if (value == nullptr) {
+    return std::nullopt;
+  }
+  return {ValueGuard<T>(std::move(cur_root), *value)};
 }
 
+/**
+ * @brief This function will insert the key-value pair into the trie. If the key already exists in the
+ * trie, it will overwrite the value.
+ */
 template <class T>
 void TrieStore::Put(std::string_view key, T value) {
   // You will need to ensure there is only one writer at a time. Think of how you can achieve this.
   // The logic should be somehow similar to `TrieStore::Get`.
-  throw NotImplementedException("TrieStore::Put is not implemented.");
+  std::lock_guard<std::mutex> lk(write_lock_);
+  auto new_root = root_.Put<T>(key, std::move(value));
+  root_lock_.lock();
+  root_ = new_root;
+  root_lock_.unlock();
 }
 
+/** @brief This function will remove the key-value pair from the trie. */
 void TrieStore::Remove(std::string_view key) {
   // You will need to ensure there is only one writer at a time. Think of how you can achieve this.
   // The logic should be somehow similar to `TrieStore::Get`.
-  throw NotImplementedException("TrieStore::Remove is not implemented.");
+  std::lock_guard<std::mutex> lk(write_lock_);
+  auto new_root = root_.Remove(key);
+  root_lock_.lock();
+  root_ = new_root;
+  root_lock_.unlock();
 }
 
 // Below are explicit instantiation of template functions.
