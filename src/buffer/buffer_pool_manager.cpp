@@ -202,27 +202,27 @@ auto BufferPoolManager::AllocatePage() -> page_id_t { return next_page_id_++; }
 
 auto BufferPoolManager::FetchPageBasic(page_id_t page_id) -> BasicPageGuard {
   auto page_basic_ptr = FetchPage(page_id);
-  return {this, page_basic_ptr};
+  return BasicPageGuard{this, page_basic_ptr};
 }
 
 auto BufferPoolManager::FetchPageRead(page_id_t page_id) -> ReadPageGuard {
   auto page_read_ptr = FetchPage(page_id);
   page_read_ptr->RLatch();
   assert(page_read_ptr != nullptr);
-  return {this, page_read_ptr};
+  return ReadPageGuard{this, page_read_ptr};
 }
 
 auto BufferPoolManager::FetchPageWrite(page_id_t page_id) -> WritePageGuard {
   auto page_write_ptr = FetchPage(page_id);
   page_write_ptr->WLatch();
   assert(page_write_ptr != nullptr);
-  return {this, page_write_ptr};
+  return WritePageGuard{this, page_write_ptr};
 }
 
 auto BufferPoolManager::NewPageGuarded(page_id_t *page_id) -> BasicPageGuard {
   auto pg_ptr = NewPage(page_id);
   assert(pg_ptr != nullptr);
-  return {this, pg_ptr};
+  return BasicPageGuard{this, pg_ptr};
 }
 
 }  // namespace bustub

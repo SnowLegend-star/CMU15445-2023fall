@@ -103,6 +103,14 @@ class BasicPageGuard {
   bool is_dirty_{false};
 };
 
+
+
+
+
+
+
+
+
 // 基于basic的ReadPageGuard
 class ReadPageGuard {
  public:
@@ -163,6 +171,9 @@ class ReadPageGuard {
   // You may choose to get rid of this and add your own private variables.
   BasicPageGuard guard_;
 };
+
+
+
 
 // 基于basic的WritePageGuard
 class WritePageGuard {

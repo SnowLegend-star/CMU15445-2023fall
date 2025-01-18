@@ -69,7 +69,7 @@ void ExtendibleHTableDirectoryPage::VerifyIntegrity() const {
     BUSTUB_ASSERT(curr_ld <= global_depth_, "there exists a local depth greater than the global depth");
 
     ++page_id_to_count[curr_page_id];
-
+    std::cout<<"PAGE: "<<curr_page_id<<" 的引用计数为: "<<page_id_to_count[curr_page_id]<<std::endl;
     if (page_id_to_ld.count(curr_page_id) > 0 && curr_ld != page_id_to_ld[curr_page_id]) {
       uint32_t old_ld = page_id_to_ld[curr_page_id];
       LOG_WARN("Verify Integrity: curr_local_depth: %u, old_local_depth %u, for page_id: %u", curr_ld, old_ld,

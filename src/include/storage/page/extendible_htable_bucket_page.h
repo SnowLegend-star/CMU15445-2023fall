@@ -52,30 +52,29 @@ class ExtendibleHTableBucketPage {
   DISALLOW_COPY_AND_MOVE(ExtendibleHTableBucketPage);
 
   /**
-   * After creating a new bucket page from buffer pool, must call initialize
-   * method to set default values
-   * @param max_size Max size of the bucket array
-   */
+  * 在从缓冲池创建新的桶页面后，必须调用初始化方法以设置默认值
+  * @param max_size 桶数组的最大大小
+  */
   void Init(uint32_t max_size = HTableBucketArraySize(sizeof(MappingType)));
 
   /**
-   * Lookup a key
-   *
-   * @param key key to lookup
-   * @param[out] value value to set
-   * @param cmp the comparator
-   * @return true if the key and value are present, false if not found.
-   */
+  * 查找一个键
+  *
+  * @param key 要查找的键
+  * @param[out] value 设置找到的值
+  * @param cmp 比较器
+  * @return 如果找到键和值，返回 true；如果没有找到，返回 false。
+  */
   auto Lookup(const KeyType &key, ValueType &value, const KeyComparator &cmp) const -> bool;
 
   /**
-   * Attempts to insert a key and value in the bucket.
-   *
-   * @param key key to insert
-   * @param value value to insert
-   * @param cmp the comparator to use
-   * @return true if inserted, false if bucket is full or the same key is already present
-   */
+  * 尝试将一个键值对插入到桶中。
+  *
+  * @param key 要插入的键
+  * @param value 要插入的值
+  * @param cmp 使用的比较器
+  * @return 如果插入成功，返回 true；如果桶已满或键已存在，则返回 false
+  */
   auto Insert(const KeyType &key, const ValueType &value, const KeyComparator &cmp) -> bool;
 
   /**
@@ -88,27 +87,27 @@ class ExtendibleHTableBucketPage {
   void RemoveAt(uint32_t bucket_idx);
 
   /**
-   * @brief Gets the key at an index in the bucket.
-   *
-   * @param bucket_idx the index in the bucket to get the key at
-   * @return key at index bucket_idx of the bucket
-   */
+  * 获取桶中某个索引位置的键。
+  *
+  * @param bucket_idx 要获取键的桶中的索引
+  * @return 桶中索引为 `bucket_idx` 位置的键
+  */
   auto KeyAt(uint32_t bucket_idx) const -> KeyType;
 
   /**
-   * Gets the value at an index in the bucket.
-   *
-   * @param bucket_idx the index in the bucket to get the value at
-   * @return value at index bucket_idx of the bucket
-   */
+  * 获取桶中某个索引位置的值。
+  *
+  * @param bucket_idx 要获取值的桶中的索引
+  * @return 桶中索引为 `bucket_idx` 位置的值
+  */
   auto ValueAt(uint32_t bucket_idx) const -> ValueType;
 
   /**
-   * Gets the entry at an index in the bucket.
-   *
-   * @param bucket_idx the index in the bucket to get the entry at
-   * @return entry at index bucket_idx of the bucket
-   */
+  * 获取桶中某个索引位置的条目。
+  *
+  * @param bucket_idx 要获取条目的桶中的索引
+  * @return 桶中索引为 `bucket_idx` 位置的条目
+  */
   auto EntryAt(uint32_t bucket_idx) const -> const std::pair<KeyType, ValueType> &;
 
   /**
