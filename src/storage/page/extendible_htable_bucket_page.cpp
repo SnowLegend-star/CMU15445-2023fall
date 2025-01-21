@@ -39,9 +39,10 @@ auto ExtendibleHTableBucketPage<K, V, KC>::Lookup(const K &key, V &value, const 
 
 
 // 没有重复的key
+// 还没有实现分裂操作
 template <typename K, typename V, typename KC>
 auto ExtendibleHTableBucketPage<K, V, KC>::Insert(const K &key, const V &value, const KC &cmp) -> bool {
-  // 如果这个bucket已经满了
+  // 如果这个bucket已经满了 
   if(size_==max_size_){ 
     return false;
   }
@@ -80,6 +81,10 @@ auto ExtendibleHTableBucketPage<K, V, KC>::Remove(const K &key, const KC &cmp) -
   return true;
 }
 
+// Attention Please!!!
+// 这里的bucket_idx表示的是在array_的数组下标
+// Directory中的bucket_idx表示的是bucket_page_id
+// 两者很容易混淆
 template <typename K, typename V, typename KC>
 void ExtendibleHTableBucketPage<K, V, KC>::RemoveAt(uint32_t bucket_idx) {
   // buk_idx不合法
@@ -91,6 +96,7 @@ void ExtendibleHTableBucketPage<K, V, KC>::RemoveAt(uint32_t bucket_idx) {
     array_[i].first=array_[i+1].first;
     array_[i].second=array_[i+1].second;
   }
+  size_--;
 }
 
 template <typename K, typename V, typename KC>

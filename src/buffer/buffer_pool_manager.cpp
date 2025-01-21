@@ -195,6 +195,7 @@ auto BufferPoolManager::DeletePage(page_id_t page_id) -> bool {
   pages_[target_frame_id].is_dirty_ = false;
 
   DeallocatePage(page_id);
+  std::cout<<"成功删除page_id: "<<page_id<<std::endl;
   return true;
 }
 

@@ -114,6 +114,7 @@ class ExtendibleHTableDirectoryPage {
    * @return 局部深度掩码，最低有效位开始为 1，其余位为 0
    */
   auto GetLocalDepthMask(uint32_t bucket_idx) const -> uint32_t{
+  // 得到local_depth不就够了吗？这个函数真的是多此一举
   auto loc_depth=local_depths_[bucket_idx];
   return (1<<(loc_depth))-1;
 }
@@ -125,7 +126,9 @@ class ExtendibleHTableDirectoryPage {
    */
   auto GetGlobalDepth() const -> uint32_t;
 
-  auto GetMaxDepth() const -> uint32_t;
+  auto GetMaxDepth() const -> uint32_t{
+    return max_depth_;
+  }
 
   /**
    * 增加目录的全局深度

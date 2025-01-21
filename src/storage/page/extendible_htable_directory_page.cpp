@@ -37,7 +37,7 @@ void ExtendibleHTableDirectoryPage::Init(uint32_t max_depth) {
 
 // 这个函数和Header部分的也是一样的吧
 auto ExtendibleHTableDirectoryPage::HashToBucketIndex(uint32_t hash) const -> uint32_t { 
-  return (hash&(1<<global_depth_)-1);
+  return hash&((1<<global_depth_)-1);
 }
 
 auto ExtendibleHTableDirectoryPage::GetBucketPageId(uint32_t bucket_idx) const -> page_id_t { 
@@ -46,9 +46,6 @@ auto ExtendibleHTableDirectoryPage::GetBucketPageId(uint32_t bucket_idx) const -
 
 void ExtendibleHTableDirectoryPage::SetBucketPageId(uint32_t bucket_idx, page_id_t bucket_page_id) {
   // 如果这个bucket_idx是新元素，设置local_depth
-  if(bucket_idx==current_size_-1){
-    local_depths_[bucket_idx]=0;
-  }
   bucket_page_ids_[bucket_idx]=bucket_page_id;
   if(global_depth_==0){
     current_size_++;
@@ -56,7 +53,17 @@ void ExtendibleHTableDirectoryPage::SetBucketPageId(uint32_t bucket_idx, page_id
 
 }
 
-auto ExtendibleHTableDirectoryPage::GetSplitImageIndex(uint32_t bucket_idx) const -> uint32_t { return 0; }
+// 这个函数要怎么实现呢？
+// 获取分裂的新bucket的编号
+// 例如初始桶是 B0000、B0001 depth=1
+// B0001的桶满了之后
+// 基于B0001分裂得到的新桶编号就是B0011 depth=2
+// B0011就是对B0001的第(local_depth)位取反得到的
+auto ExtendibleHTableDirectoryPage::GetSplitImageIndex(uint32_t bucket_idx) const -> uint32_t {
+  auto local_depth=GetLocalDepth(bucket_idx);
+  auto local_mask=GetLocalDepthMask(bucket_idx);
+  return (bucket_idx&local_mask)^(1<<(local_depth-1));
+}
 
 auto ExtendibleHTableDirectoryPage::GetGlobalDepth() const -> uint32_t { 
   return global_depth_;
@@ -120,6 +127,10 @@ void ExtendibleHTableDirectoryPage::SetLocalDepth(uint32_t bucket_idx, uint8_t l
 }
 
 void ExtendibleHTableDirectoryPage::IncrLocalDepth(uint32_t bucket_idx) {
+  // 如果local_detph不能直接++, 需要先进行global_depth++
+  if(local_depths_[bucket_idx]==global_depth_){
+    IncrGlobalDepth();
+  }
   local_depths_[bucket_idx]++;
 }
 

@@ -23,6 +23,7 @@
  */
 #pragma once
 
+#include <cstdint>
 #include <optional>
 #include <utility>
 #include <vector>
@@ -129,6 +130,11 @@ class ExtendibleHTableBucketPage {
    * Prints the bucket's occupancy information
    */
   void PrintBucket() const;
+
+  /**
+   * Prints the bucket's occupancy information
+   */
+  void MyPrintBucket(uint32_t page_id) const;
 
  private:
   uint32_t size_;

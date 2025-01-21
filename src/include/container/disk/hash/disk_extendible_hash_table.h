@@ -30,92 +30,94 @@
 namespace bustub {
 
 /**
- * Implementation of extendible hash table that is backed by a buffer pool
- * manager. Non-unique keys are supported. Supports insert and delete. The
- * table grows/shrinks dynamically as buckets become full/empty.
+ * 实现了一个扩展哈希表，基于缓冲池管理器进行支持。支持非唯一键。支持插入和删除操作。
+ * 当桶变满或空时，表会动态增长/缩小。
  */
 template <typename K, typename V, typename KC>
 class DiskExtendibleHashTable {
  public:
   /**
-   * @brief Creates a new DiskExtendibleHashTable.
+   * @brief 创建一个新的扩展哈希表。
    *
-   * @param name
-   * @param bpm buffer pool manager to be used
-   * @param cmp comparator for keys
-   * @param hash_fn the hash function
-   * @param header_max_depth the max depth allowed for the header page
-   * @param directory_max_depth the max depth allowed for the directory page
-   * @param bucket_max_size the max size allowed for the bucket page array
+   * @param name 表的名称
+   * @param bpm 用于操作的缓冲池管理器
+   * @param cmp 键的比较器
+   * @param hash_fn 哈希函数
+   * @param header_max_depth 头页允许的最大深度
+   * @param directory_max_depth 目录页允许的最大深度
+   * @param bucket_max_size 桶页数组的最大大小
    */
   explicit DiskExtendibleHashTable(const std::string &name, BufferPoolManager *bpm, const KC &cmp,
                                    const HashFunction<K> &hash_fn, uint32_t header_max_depth = HTABLE_HEADER_MAX_DEPTH,
                                    uint32_t directory_max_depth = HTABLE_DIRECTORY_MAX_DEPTH,
                                    uint32_t bucket_max_size = HTableBucketArraySize(sizeof(std::pair<K, V>)));
 
-  /** TODO(P2): Add implementation
-   * Inserts a key-value pair into the hash table.
+  /** TODO(P2): 添加实现
+   * 将一个键值对插入哈希表。
    *
-   * @param key the key to create
-   * @param value the value to be associated with the key
-   * @param transaction the current transaction
-   * @return true if insert succeeded, false otherwise
+   * @param key 要插入的键
+   * @param value 与键关联的值
+   * @param transaction 当前的事务
+   * @return 如果插入成功则返回true，否则返回false
    */
   auto Insert(const K &key, const V &value, Transaction *transaction = nullptr) -> bool;
 
-  /** TODO(P2): Add implementation
-   * Removes a key-value pair from the hash table.
+  /** TODO(P2): 添加实现
+   * 从哈希表中删除一个键值对。
    *
-   * @param key the key to delete
-   * @param value the value to delete
-   * @param transaction the current transaction
-   * @return true if remove succeeded, false otherwise
+   * @param key 要删除的键
+   * @param value 要删除的值
+   * @param transaction 当前的事务
+   * @return 如果删除成功则返回true，否则返回false
    */
   auto Remove(const K &key, Transaction *transaction = nullptr) -> bool;
 
-  /** TODO(P2): Add implementation
-   * Get the value associated with a given key in the hash table.
+  /** TODO(P2): 添加实现
+   * 获取与给定键关联的值。
    *
-   * Note(fall2023): This semester you will only need to support unique key-value pairs.
+   * 注意(fall2023): 本学期你只需要支持唯一的键值对。
    *
-   * @param key the key to look up
-   * @param[out] result the value(s) associated with a given key
-   * @param transaction the current transaction
-   * @return the value(s) associated with the given key
+   * @param key 要查找的键
+   * @param[out] result 与给定键关联的值(s)
+   * @param transaction 当前的事务
+   * @return 返回与给定键关联的值(s)
    */
   auto GetValue(const K &key, std::vector<V> *result, Transaction *transaction = nullptr) const -> bool;
 
   /**
-   * Helper function to verify the integrity of the extendible hash table's directory.
+   * 帮助函数，用于验证扩展哈希表目录的完整性。
    */
   void VerifyIntegrity() const;
 
   /**
-   * Helper function to expose the header page id.
+   * 帮助函数，用于暴露头页的页面ID。
    */
   auto GetHeaderPageId() const -> page_id_t;
 
   /**
-   * Helper function to print out the HashTable.
+   * 帮助函数，用于打印哈希表的内容。
    */
   void PrintHT() const;
 
  private:
   /**
-   * Hash - simple helper to downcast MurmurHash's 64-bit hash to 32-bit
-   * for extendible hashing.
+   * 哈希 - 简单的帮助函数，用于将MurmurHash的64位哈希值下转为32位
+   * 以便用于扩展哈希。
    *
-   * @param key the key to hash
-   * @return the down-casted 32-bit hash
+   * @param key 要哈希的键
+   * @return 下转为32位的哈希值
    */
   auto Hash(K key) const -> uint32_t;
 
+// 这里给出hash真是令人费解？
+// 好像是创建新目录的同时也要创建个新的Bucket吧
   auto InsertToNewDirectory(ExtendibleHTableHeaderPage *header, uint32_t directory_idx, uint32_t hash, const K &key,
                             const V &value) -> bool;
 
   auto InsertToNewBucket(ExtendibleHTableDirectoryPage *directory, uint32_t bucket_idx, const K &key, const V &value)
       -> bool;
 
+// bucket分裂的时候就要更新上层的Directory
   void UpdateDirectoryMapping(ExtendibleHTableDirectoryPage *directory, uint32_t new_bucket_idx,
                               page_id_t new_bucket_page_id, uint32_t new_local_depth, uint32_t local_depth_mask);
 
@@ -123,15 +125,15 @@ class DiskExtendibleHashTable {
                       ExtendibleHTableBucketPage<K, V, KC> *new_bucket, uint32_t new_bucket_idx,
                       uint32_t local_depth_mask);
 
-  // member variables
-  std::string index_name_;
-  BufferPoolManager *bpm_;
-  KC cmp_;
-  HashFunction<K> hash_fn_;
-  uint32_t header_max_depth_;
-  uint32_t directory_max_depth_;
-  uint32_t bucket_max_size_;
-  page_id_t header_page_id_;
+  // 成员变量
+  std::string index_name_;  // 哈希表的名称
+  BufferPoolManager *bpm_;  // 缓冲池管理器
+  KC cmp_;  // 键的比较器
+  HashFunction<K> hash_fn_;  // 哈希函数
+  uint32_t header_max_depth_;  // 头页的最大深度
+  uint32_t directory_max_depth_;  // 目录页的最大深度
+  uint32_t bucket_max_size_;  // 桶页数组的最大大小
+  page_id_t header_page_id_;  // 头页的页面ID
 };
 
 }  // namespace bustub

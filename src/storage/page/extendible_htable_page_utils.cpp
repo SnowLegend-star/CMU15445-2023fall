@@ -10,6 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cstdint>
 #include "common/logger.h"
 #include "common/macros.h"
 #include "storage/page/extendible_htable_bucket_page.h"
@@ -39,6 +40,17 @@ void ExtendibleHTableDirectoryPage::PrintDirectory() const {
 template <typename K, typename V, typename KC>
 void ExtendibleHTableBucketPage<K, V, KC>::PrintBucket() const {
   std::cout << "======== BUCKET (size_: " << size_ << " | max_size_: " << max_size_ << ") ========\n";
+  std::cout << ("| i | k | v |\n");
+  for (uint32_t idx = 0; idx < size_; idx++) {
+    std::cout << "| " << idx << " | " << KeyAt(idx) << " | " << ValueAt(idx) << " |\n";
+  }
+  std::cout << "================ END BUCKET ================\n";
+  std::cout << "\n";
+}
+
+template <typename K, typename V, typename KC>
+void ExtendibleHTableBucketPage<K, V, KC>::MyPrintBucket(uint32_t page_id) const {
+  std::cout << "======== BUCKET (page_id_: "<<page_id<<" | size_: " << size_ << " | max_size_: " << max_size_ << ") ========\n";
   std::cout << ("| i | k | v |\n");
   for (uint32_t idx = 0; idx < size_; idx++) {
     std::cout << "| " << idx << " | " << KeyAt(idx) << " | " << ValueAt(idx) << " |\n";
