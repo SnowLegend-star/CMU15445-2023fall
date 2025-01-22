@@ -109,15 +109,15 @@ class DiskExtendibleHashTable {
    */
   auto Hash(K key) const -> uint32_t;
 
-// 这里给出hash真是令人费解？
-// 好像是创建新目录的同时也要创建个新的Bucket吧
+  // 这里给出hash真是令人费解？
+  // 好像是创建新目录的同时也要创建个新的Bucket吧
   auto InsertToNewDirectory(ExtendibleHTableHeaderPage *header, uint32_t directory_idx, uint32_t hash, const K &key,
                             const V &value) -> bool;
 
   auto InsertToNewBucket(ExtendibleHTableDirectoryPage *directory, uint32_t bucket_idx, const K &key, const V &value)
       -> bool;
 
-// bucket分裂的时候就要更新上层的Directory
+  // bucket分裂的时候就要更新上层的Directory
   void UpdateDirectoryMapping(ExtendibleHTableDirectoryPage *directory, uint32_t new_bucket_idx,
                               page_id_t new_bucket_page_id, uint32_t new_local_depth, uint32_t local_depth_mask);
 
@@ -126,14 +126,14 @@ class DiskExtendibleHashTable {
                       uint32_t local_depth_mask);
 
   // 成员变量
-  std::string index_name_;  // 哈希表的名称
-  BufferPoolManager *bpm_;  // 缓冲池管理器
-  KC cmp_;  // 键的比较器
-  HashFunction<K> hash_fn_;  // 哈希函数
-  uint32_t header_max_depth_;  // 头页的最大深度
+  std::string index_name_;        // 哈希表的名称
+  BufferPoolManager *bpm_;        // 缓冲池管理器
+  KC cmp_;                        // 键的比较器
+  HashFunction<K> hash_fn_;       // 哈希函数
+  uint32_t header_max_depth_;     // 头页的最大深度
   uint32_t directory_max_depth_;  // 目录页的最大深度
-  uint32_t bucket_max_size_;  // 桶页数组的最大大小
-  page_id_t header_page_id_;  // 头页的页面ID
+  uint32_t bucket_max_size_;      // 桶页数组的最大大小
+  page_id_t header_page_id_;      // 头页的页面ID
 };
 
 }  // namespace bustub

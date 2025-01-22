@@ -22,42 +22,41 @@ namespace bustub {
 
 template <typename K, typename V, typename KC>
 void ExtendibleHTableBucketPage<K, V, KC>::Init(uint32_t max_size) {
-  size_=0;
-  max_size_=max_size;
+  size_ = 0;
+  max_size_ = max_size;
 }
 
 template <typename K, typename V, typename KC>
 auto ExtendibleHTableBucketPage<K, V, KC>::Lookup(const K &key, V &value, const KC &cmp) const -> bool {
-  for(uint32_t i=0;i<size_;i++){
-    if(cmp(array_[i].first,key)==0){
-      value=array_[i].second;
-        return true;
-      }
+  for (uint32_t i = 0; i < size_; i++) {
+    if (cmp(array_[i].first, key) == 0) {
+      value = array_[i].second;
+      return true;
     }
+  }
   return false;
 }
-
 
 // 没有重复的key
 // 还没有实现分裂操作
 template <typename K, typename V, typename KC>
 auto ExtendibleHTableBucketPage<K, V, KC>::Insert(const K &key, const V &value, const KC &cmp) -> bool {
-  // 如果这个bucket已经满了 
-  if(size_==max_size_){ 
+  // 如果这个bucket已经满了
+  if (size_ == max_size_) {
     return false;
   }
 
   // 如果有重复的key, 就地修改
-  for(uint32_t i=0;i<size_;i++){
-    if(cmp(array_[i].first,key)==0){
-        array_[i].second=value;
-        return true;
+  for (uint32_t i = 0; i < size_; i++) {
+    if (cmp(array_[i].first, key) == 0) {
+      array_[i].second = value;
+      return true;
     }
   }
 
   // 在bucket的最末尾插入新的key
-  array_[size_].first=key;
-  array_[size_].second=value;
+  array_[size_].first = key;
+  array_[size_].second = value;
   size_++;
   return true;
 }
@@ -88,13 +87,13 @@ auto ExtendibleHTableBucketPage<K, V, KC>::Remove(const K &key, const KC &cmp) -
 template <typename K, typename V, typename KC>
 void ExtendibleHTableBucketPage<K, V, KC>::RemoveAt(uint32_t bucket_idx) {
   // buk_idx不合法
-  if(bucket_idx>=size_){
-    return ;
+  if (bucket_idx >= size_) {
+    return;
   }
-  uint32_t i=bucket_idx;
-  for(;i<size_-1;i++){
-    array_[i].first=array_[i+1].first;
-    array_[i].second=array_[i+1].second;
+  uint32_t i = bucket_idx;
+  for (; i < size_ - 1; i++) {
+    array_[i].first = array_[i + 1].first;
+    array_[i].second = array_[i + 1].second;
   }
   size_--;
 }
@@ -102,20 +101,20 @@ void ExtendibleHTableBucketPage<K, V, KC>::RemoveAt(uint32_t bucket_idx) {
 template <typename K, typename V, typename KC>
 auto ExtendibleHTableBucketPage<K, V, KC>::KeyAt(uint32_t bucket_idx) const -> K {
   // buk_idx不合法
-  if(bucket_idx>=size_){
+  if (bucket_idx >= size_) {
     return {};
   }
-  
+
   return array_[bucket_idx].first;
 }
 
 template <typename K, typename V, typename KC>
 auto ExtendibleHTableBucketPage<K, V, KC>::ValueAt(uint32_t bucket_idx) const -> V {
-    // buk_idx不合法
-  if(bucket_idx>=size_){
+  // buk_idx不合法
+  if (bucket_idx >= size_) {
     return {};
   }
-  
+
   return array_[bucket_idx].second;
 }
 
@@ -131,12 +130,24 @@ auto ExtendibleHTableBucketPage<K, V, KC>::Size() const -> uint32_t {
 
 template <typename K, typename V, typename KC>
 auto ExtendibleHTableBucketPage<K, V, KC>::IsFull() const -> bool {
-  return size_==max_size_;
+  return size_ == max_size_;
 }
 
 template <typename K, typename V, typename KC>
 auto ExtendibleHTableBucketPage<K, V, KC>::IsEmpty() const -> bool {
-  return size_==0;
+  return size_ == 0;
+}
+
+template <typename K, typename V, typename KC>
+void ExtendibleHTableBucketPage<K, V, KC>::MyPrintBucket(uint32_t page_id) const {
+  std::cout << "======== BUCKET (page_id_: " << page_id << " | size_: " << size_ << " | max_size_: " << max_size_
+            << ") ========\n";
+  std::cout << ("| i | k | v |\n");
+  for (uint32_t idx = 0; idx < size_; idx++) {
+    std::cout << "| " << idx << " | " << KeyAt(idx) << " | " << ValueAt(idx) << " |\n";
+  }
+  std::cout << "================ END BUCKET ================\n";
+  std::cout << "\n";
 }
 
 template class ExtendibleHTableBucketPage<int, int, IntComparator>;

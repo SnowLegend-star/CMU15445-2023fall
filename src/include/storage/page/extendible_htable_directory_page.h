@@ -102,10 +102,10 @@ class ExtendibleHTableDirectoryPage {
    *
    * @return global_depth 个 1 和其余位为 0 的掩码（最低有效位开始为 1）
    */
-  auto GetGlobalDepthMask() const -> uint32_t{
-  auto glo_depth=GetGlobalDepth();
-  return (1<<(glo_depth))-1;
-}
+  auto GetGlobalDepthMask() const -> uint32_t {
+    auto glo_depth = GetGlobalDepth();
+    return (1 << (glo_depth)) - 1;
+  }
 
   /**
    * GetLocalDepthMask - 和 global depth 掩码相似，但它使用 bucket_idx 对应桶的局部深度（local depth）来计算。
@@ -113,11 +113,11 @@ class ExtendibleHTableDirectoryPage {
    * @param bucket_idx 查找局部深度的索引
    * @return 局部深度掩码，最低有效位开始为 1，其余位为 0
    */
-  auto GetLocalDepthMask(uint32_t bucket_idx) const -> uint32_t{
-  // 得到local_depth不就够了吗？这个函数真的是多此一举
-  auto loc_depth=local_depths_[bucket_idx];
-  return (1<<(loc_depth))-1;
-}
+  auto GetLocalDepthMask(uint32_t bucket_idx) const -> uint32_t {
+    // 得到local_depth不就够了吗？这个函数真的是多此一举
+    auto loc_depth = local_depths_[bucket_idx];
+    return (1 << (loc_depth)) - 1;
+  }
 
   /**
    * 获取哈希表目录的全局深度
@@ -126,9 +126,7 @@ class ExtendibleHTableDirectoryPage {
    */
   auto GetGlobalDepth() const -> uint32_t;
 
-  auto GetMaxDepth() const -> uint32_t{
-    return max_depth_;
-  }
+  auto GetMaxDepth() const -> uint32_t { return max_depth_; }
 
   /**
    * 增加目录的全局深度
@@ -199,10 +197,10 @@ class ExtendibleHTableDirectoryPage {
   void PrintDirectory() const;
 
  private:
-  uint32_t max_depth_;  // 目录页的最大深度
-  uint32_t global_depth_;  // 目录页的全局深度
-  uint8_t local_depths_[HTABLE_DIRECTORY_ARRAY_SIZE];  // 存储每个桶的局部深度
+  uint32_t max_depth_;                                      // 目录页的最大深度
+  uint32_t global_depth_;                                   // 目录页的全局深度
+  uint8_t local_depths_[HTABLE_DIRECTORY_ARRAY_SIZE];       // 存储每个桶的局部深度
   page_id_t bucket_page_ids_[HTABLE_DIRECTORY_ARRAY_SIZE];  // 存储每个桶的页面 ID
-  uint32_t current_size_;  // 当前目录有效entry的数量
+  uint32_t current_size_;                                   // 当前目录有效entry的数量
 };
 }  // namespace bustub

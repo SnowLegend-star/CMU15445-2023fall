@@ -39,6 +39,8 @@ BufferPoolManager::BufferPoolManager(size_t pool_size, DiskManager *disk_manager
   for (size_t i = 0; i < pool_size_; ++i) {
     free_list_.emplace_back(static_cast<int>(i));
   }
+  std::cout << "用来初始化BufferPoolManager的参数为: ======== (pool_size: " << pool_size
+            << " | replacer_k: " << replacer_k << ") ========" << std::endl;
 }
 
 BufferPoolManager::~BufferPoolManager() { delete[] pages_; }
@@ -195,7 +197,7 @@ auto BufferPoolManager::DeletePage(page_id_t page_id) -> bool {
   pages_[target_frame_id].is_dirty_ = false;
 
   DeallocatePage(page_id);
-  std::cout<<"成功删除page_id: "<<page_id<<std::endl;
+  std::cout << "成功删除page_id: " << page_id << std::endl;
   return true;
 }
 
@@ -216,6 +218,7 @@ auto BufferPoolManager::FetchPageRead(page_id_t page_id) -> ReadPageGuard {
 auto BufferPoolManager::FetchPageWrite(page_id_t page_id) -> WritePageGuard {
   auto page_write_ptr = FetchPage(page_id);
   page_write_ptr->WLatch();
+  std::cout << "page_id: " << page_id << "获得写锁" << std::endl;
   assert(page_write_ptr != nullptr);
   return WritePageGuard{this, page_write_ptr};
 }

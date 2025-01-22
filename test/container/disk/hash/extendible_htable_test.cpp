@@ -10,6 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cstdint>
 #include <thread>  // NOLINT
 #include <vector>
 
@@ -154,6 +155,46 @@ TEST(ExtendibleHTableTest, RemoveTest1) {
   }
 
   ht.VerifyIntegrity();
+}
+
+// NOLINTNEXTLINE
+TEST(ExtendibleHTableTest, RecursiveMergeTest) {
+  auto disk_mgr = std::make_unique<DiskManagerUnlimitedMemory>();
+  auto bpm = std::make_unique<BufferPoolManager>(50, disk_mgr.get());
+
+  DiskExtendibleHashTable<int, int, IntComparator> ht("blah", bpm.get(), IntComparator(), HashFunction<int>(), 2, 3, 2);
+
+  ht.Insert(4, 4);
+  ht.Insert(5, 5);
+  ht.Insert(6, 6);
+  ht.Insert(14, 14);
+  ht.VerifyIntegrity();
+
+  ht.Remove(5);
+  ht.Remove(4);
+  ht.Remove(14);
+
+  ht.VerifyIntegrity();
+}
+
+TEST(ExtendibleHTableTest, GrowShrinkTest) {
+  auto disk_mgr = std::make_unique<DiskManagerUnlimitedMemory>();
+  auto bpm = std::make_unique<BufferPoolManager>(3, disk_mgr.get(), 10);
+
+  DiskExtendibleHashTable<int, int, IntComparator> ht("blah", bpm.get(), IntComparator(), HashFunction<int>(), 9, 9,
+                                                      511);
+
+  uint32_t i = 0;
+  for (; i <= 510; i++) {
+    ht.Insert(i, i);
+  }
+  ht.Insert(511, 511);
+  i++;
+  for (; i <= 998; i++) {
+    ht.Insert(i, i);
+  }
+  ht.Insert(999, 999);
+  ht.Remove(0);
 }
 
 }  // namespace bustub

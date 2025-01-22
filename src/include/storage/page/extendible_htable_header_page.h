@@ -27,9 +27,11 @@ namespace bustub {
 
 // 以下是一些常量的定义：
 
-static constexpr uint64_t HTABLE_HEADER_PAGE_METADATA_SIZE = sizeof(uint32_t);  // 哈希表头页面的元数据大小（一个 uint32_t 的大小）
+static constexpr uint64_t HTABLE_HEADER_PAGE_METADATA_SIZE =
+    sizeof(uint32_t);  // 哈希表头页面的元数据大小（一个 uint32_t 的大小）
 static constexpr uint64_t HTABLE_HEADER_MAX_DEPTH = 9;  // 哈希表头页面的最大深度（最大深度为 9）
-static constexpr uint64_t HTABLE_HEADER_ARRAY_SIZE = 1 << HTABLE_HEADER_MAX_DEPTH;  // 哈希表头页面中目录数组的大小，基于最大深度（2^9）
+static constexpr uint64_t HTABLE_HEADER_ARRAY_SIZE =
+    1 << HTABLE_HEADER_MAX_DEPTH;  // 哈希表头页面中目录数组的大小，基于最大深度（2^9）
 
 // 哈希表头页面类的定义
 class ExtendibleHTableHeaderPage {
@@ -81,7 +83,7 @@ class ExtendibleHTableHeaderPage {
  private:
   // 目录页面 ID 数组，大小为 HTABLE_HEADER_ARRAY_SIZE
   page_id_t directory_page_ids_[HTABLE_HEADER_ARRAY_SIZE];
-  
+
   // 最大深度
   uint32_t max_depth_;
 };
@@ -90,7 +92,7 @@ class ExtendibleHTableHeaderPage {
 static_assert(sizeof(page_id_t) == 4);
 
 // 检查 ExtendibleHTableHeaderPage 的大小是否符合预期
-static_assert(sizeof(ExtendibleHTableHeaderPage) == 
+static_assert(sizeof(ExtendibleHTableHeaderPage) ==
               sizeof(page_id_t) * HTABLE_HEADER_ARRAY_SIZE + HTABLE_HEADER_PAGE_METADATA_SIZE);
 
 // 检查 ExtendibleHTableHeaderPage 的大小是否不超过页面大小
