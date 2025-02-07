@@ -29,8 +29,8 @@ using SchemaRef = std::shared_ptr<const Schema>;
 class Schema {
  public:
   /**
-   * Constructs the schema corresponding to the vector of columns, read left-to-right.
-   * @param columns columns that describe the schema's individual columns
+   * 构造与给定列向量对应的 schema，从左到右读取列。
+   * @param columns 描述 schema 中各列的列
    */
   explicit Schema(const std::vector<Column> &columns);
 
@@ -43,21 +43,21 @@ class Schema {
     return Schema{cols};
   }
 
-  /** @return all the columns in the schema */
+  /** @return schema 中的所有列 */
   auto GetColumns() const -> const std::vector<Column> & { return columns_; }
 
   /**
-   * Returns a specific column from the schema.
-   * @param col_idx index of requested column
-   * @return requested column
+   * 返回 schema 中的特定列。
+   * @param col_idx 请求的列索引
+   * @return 请求的列
    */
   auto GetColumn(const uint32_t col_idx) const -> const Column & { return columns_[col_idx]; }
 
   /**
-   * Looks up and returns the index of the first column in the schema with the specified name.
-   * If multiple columns have the same name, the first such index is returned.
-   * @param col_name name of column to look for
-   * @return the index of a column with the given name, throws an exception if it does not exist
+   * 查找并返回 schema 中第一个具有指定名称的列的索引。
+   * 如果有多个列具有相同的名称，返回第一个匹配的索引。
+   * @param col_name 要查找的列的名称
+   * @return 具有指定名称的列的索引，如果不存在则抛出异常
    */
   auto GetColIdx(const std::string &col_name) const -> uint32_t {
     if (auto col_idx = TryGetColIdx(col_name)) {
@@ -67,10 +67,10 @@ class Schema {
   }
 
   /**
-   * Looks up and returns the index of the first column in the schema with the specified name.
-   * If multiple columns have the same name, the first such index is returned.
-   * @param col_name name of column to look for
-   * @return the index of a column with the given name, `std::nullopt` if it does not exist
+   * 查找并返回 schema 中第一个具有指定名称的列的索引。
+   * 如果有多个列具有相同的名称，返回第一个匹配的索引。
+   * @param col_name 要查找的列的名称
+   * @return 具有指定名称的列的索引，若不存在则返回 `std::nullopt`
    */
   auto TryGetColIdx(const std::string &col_name) const -> std::optional<uint32_t> {
     for (uint32_t i = 0; i < columns_.size(); ++i) {
@@ -81,37 +81,38 @@ class Schema {
     return std::nullopt;
   }
 
-  /** @return the indices of non-inlined columns */
+  /** @return 所有未内联列的索引 */
   auto GetUnlinedColumns() const -> const std::vector<uint32_t> & { return uninlined_columns_; }
 
-  /** @return the number of columns in the schema for the tuple */
+  /** @return schema 中元组的列数 */
   auto GetColumnCount() const -> uint32_t { return static_cast<uint32_t>(columns_.size()); }
 
-  /** @return the number of non-inlined columns */
+  /** @return 未内联列的数量 */
   auto GetUnlinedColumnCount() const -> uint32_t { return static_cast<uint32_t>(uninlined_columns_.size()); }
 
-  /** @return the number of bytes used by one tuple */
+  /** @return 每个元组使用的字节数 */
   inline auto GetLength() const -> uint32_t { return length_; }
 
-  /** @return true if all columns are inlined, false otherwise */
+  /** @return 如果所有列都是内联的，则返回 true，否则返回 false */
   inline auto IsInlined() const -> bool { return tuple_is_inlined_; }
 
-  /** @return string representation of this schema */
+  /** @return schema 的字符串表示 */
   auto ToString(bool simplified = true) const -> std::string;
 
  private:
-  /** Fixed-length column size, i.e. the number of bytes used by one tuple. */
+  /** 固定长度列大小，即每个元组使用的字节数。 */
   uint32_t length_;
 
-  /** All the columns in the schema, inlined and uninlined. */
+  /** 所有列的集合，包括内联列和非内联列。 */
   std::vector<Column> columns_;
 
-  /** True if all the columns are inlined, false otherwise. */
+  /** 如果所有列都是内联的，则为 true，否则为 false。 */
   bool tuple_is_inlined_{true};
 
-  /** Indices of all uninlined columns. */
+  /** 所有非内联列的索引。 */
   std::vector<uint32_t> uninlined_columns_;
 };
+
 
 }  // namespace bustub
 

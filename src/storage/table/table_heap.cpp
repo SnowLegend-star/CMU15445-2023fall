@@ -49,6 +49,7 @@ auto TableHeap::InsertTuple(const TupleMeta &meta, const Tuple &tuple, LockManag
     }
 
     // if there's no tuple in the page, and we can't insert the tuple, then this tuple is too large.
+    // 如果页面是空的, 但是我们还是塞不下这个tuple, 那就直接终止了
     BUSTUB_ENSURE(page->GetNumTuples() != 0, "tuple is too large, cannot insert");
 
     page_id_t next_page_id = INVALID_PAGE_ID;

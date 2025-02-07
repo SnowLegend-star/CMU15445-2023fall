@@ -22,15 +22,16 @@
 
 namespace bustub {
 /**
- * ColumnValueExpression maintains the tuple index and column index relative to a particular schema or join.
+ * ColumnValueExpression 维护了一个元组索引和相对于特定模式或连接的列索引
  */
 class ColumnValueExpression : public AbstractExpression {
  public:
   /**
-   * ColumnValueExpression is an abstraction around "Table.member" in terms of indexes.
-   * @param tuple_idx {tuple index 0 = left side of join, tuple index 1 = right side of join}
-   * @param col_idx the index of the column in the schema
-   * @param ret_type the return type of the expression
+   * ColumnValueExpression 是对 "Table.member" 的抽象表示，基于索引。
+   * ⚡ 注意：这个类是叶子节点（Leaf Expression），所以它的 children_ 为空 {}
+   * @param tuple_idx {元组索引 0 = 连接的左侧，元组索引 1 = 连接的右侧}
+   * @param col_idx 列在模式中的索引
+   * @param ret_type 表达式的返回类型
    */
   ColumnValueExpression(uint32_t tuple_idx, uint32_t col_idx, TypeId ret_type)
       : AbstractExpression({}, ret_type), tuple_idx_{tuple_idx}, col_idx_{col_idx} {}
@@ -49,14 +50,17 @@ class ColumnValueExpression : public AbstractExpression {
   auto GetColIdx() const -> uint32_t { return col_idx_; }
 
   /** @return the string representation of the plan node and its children */
+  // "#1.3" 代表 右表（1）中的第 3 列。 
+  // 终于找到这句话的跟脚了
   auto ToString() const -> std::string override { return fmt::format("#{}.{}", tuple_idx_, col_idx_); }
 
   BUSTUB_EXPR_CLONE_WITH_CHILDREN(ColumnValueExpression);
 
  private:
-  /** Tuple index 0 = left side of join, tuple index 1 = right side of join */
+  /** 元组索引 0 = 连接的左侧，元组索引 1 = 连接的右侧 */
   uint32_t tuple_idx_;
   /** Column index refers to the index within the schema of the tuple, e.g. schema {A,B,C} has indexes {0,1,2} */
-  uint32_t col_idx_;
+  /** 列索引指的是元组模式中的索引，例如模式 {A,B,C} 对应的索引是 {0,1,2} */
+  uint32_t col_idx_;  // 我觉得这里就和attrs是一回事
 };
 }  // namespace bustub

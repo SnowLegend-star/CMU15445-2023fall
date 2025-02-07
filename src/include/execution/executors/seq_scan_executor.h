@@ -14,41 +14,48 @@
 
 #include <vector>
 
+#include "catalog/catalog.h"
+#include "common/rid.h"
 #include "execution/executor_context.h"
 #include "execution/executors/abstract_executor.h"
 #include "execution/plans/seq_scan_plan.h"
+#include "storage/table/table_heap.h"
 #include "storage/table/tuple.h"
 
 namespace bustub {
 
 /**
- * The SeqScanExecutor executor executes a sequential table scan.
+ * SeqScanExecutor 执行器执行顺序表扫描。
  */
 class SeqScanExecutor : public AbstractExecutor {
  public:
   /**
-   * Construct a new SeqScanExecutor instance.
-   * @param exec_ctx The executor context
-   * @param plan The sequential scan plan to be executed
+   * 构造一个新的 SeqScanExecutor 实例。
+   * @param exec_ctx 执行器上下文
+   * @param plan 要执行的顺序扫描计划
    */
   SeqScanExecutor(ExecutorContext *exec_ctx, const SeqScanPlanNode *plan);
 
-  /** Initialize the sequential scan */
+  /** 初始化顺序扫描 */
   void Init() override;
 
   /**
-   * Yield the next tuple from the sequential scan.
-   * @param[out] tuple The next tuple produced by the scan
-   * @param[out] rid The next tuple RID produced by the scan
-   * @return `true` if a tuple was produced, `false` if there are no more tuples
+   * 生成顺序扫描中的下一个元组。
+   * @param[out] tuple 顺序扫描产生的下一个元组
+   * @param[out] rid 顺序扫描产生的下一个元组的 RID
+   * @return 如果生成了元组，则返回 `true`；如果没有更多元组，则返回 `false`
    */
   auto Next(Tuple *tuple, RID *rid) -> bool override;
 
-  /** @return The output schema for the sequential scan */
+  /** @return 顺序扫描的输出模式 */
   auto GetOutputSchema() const -> const Schema & override { return plan_->OutputSchema(); }
 
  private:
-  /** The sequential scan plan node to be executed */
+  /** 要执行的顺序扫描计划节点 */
   const SeqScanPlanNode *plan_;
+  TableInfo *table_info_;
+  TableHeap *table_heap_;
+  std::vector<RID> rids_;
+  std::vector<bustub::RID>::iterator iter_start_;
 };
 }  // namespace bustub

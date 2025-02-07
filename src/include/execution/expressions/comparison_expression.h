@@ -24,11 +24,14 @@
 
 namespace bustub {
 
-/** ComparisonType represents the type of comparison that we want to perform. */
+/** ComparisonType 定义了所有支持的比较运算符 */
 enum class ComparisonType { Equal, NotEqual, LessThan, LessThanOrEqual, GreaterThan, GreaterThanOrEqual };
 
+// SELECT * FROM table1 t1 JOIN table2 t2 ON t1.id = t2.id
+// 其中 t1.id = t2.id 就是 ComparisonExpression。
+
 /**
- * ComparisonExpression represents two expressions being compared.
+ * ComparisonExpression代表两个被比较的表达式.
  */
 class ComparisonExpression : public AbstractExpression {
  public:

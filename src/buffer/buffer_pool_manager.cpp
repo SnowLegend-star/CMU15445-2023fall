@@ -218,7 +218,7 @@ auto BufferPoolManager::FetchPageRead(page_id_t page_id) -> ReadPageGuard {
 auto BufferPoolManager::FetchPageWrite(page_id_t page_id) -> WritePageGuard {
   auto page_write_ptr = FetchPage(page_id);
   page_write_ptr->WLatch();
-  std::cout << "page_id: " << page_id << "获得写锁" << std::endl;
+  // std::cout << "page_id: " << page_id << "获得写锁" << std::endl;
   assert(page_write_ptr != nullptr);
   return WritePageGuard{this, page_write_ptr};
 }

@@ -33,13 +33,13 @@ auto Optimizer::OptimizeOrderByAsIndexScan(const AbstractPlanNodeRef &plan) -> A
     const auto &order_bys = sort_plan.GetOrderBy();
 
     std::vector<uint32_t> order_by_column_ids;
-    for (const auto &[order_type, expr] : order_bys) {
-      // Order type is asc or default
+    for (const auto &[order_type, expr] : order_bys) { // 首先通过 order_bys 遍历排序条件，提取每个排序条件的列索引
+      // Order type is asc or default 降序排序的顺序与大多数索引的顺序不同
       if (!(order_type == OrderByType::ASC || order_type == OrderByType::DEFAULT)) {
         return optimized_plan;
       }
 
-      // Order expression is a column value expression
+      // Order expression is a column value expression 确保排序表达式是列值表达式
       const auto *column_value_expr = dynamic_cast<ColumnValueExpression *>(expr.get());
       if (column_value_expr == nullptr) {
         return optimized_plan;

@@ -9,6 +9,7 @@
 
 namespace bustub {
 
+// 通过合并某些 Projection 节点和其子节点，避免冗余的投影操作
 auto Optimizer::OptimizeMergeProjection(const AbstractPlanNodeRef &plan) -> AbstractPlanNodeRef {
   std::vector<AbstractPlanNodeRef> children;
   for (const auto &child : plan->GetChildren()) {

@@ -23,33 +23,33 @@
 namespace bustub {
 
 /**
- * The ValuesExecutor executor produces rows of values.
+ * ValuesExecutor 执行器用于生成值的行。
  */
 class ValuesExecutor : public AbstractExecutor {
  public:
   /**
-   * Construct a new ValuesExecutor instance.
-   * @param exec_ctx The executor context
-   * @param plan The values plan to be executed
+   * 构造一个新的 ValuesExecutor 实例。
+   * @param exec_ctx 执行器上下文
+   * @param plan 要执行的 values 计划
    */
   ValuesExecutor(ExecutorContext *exec_ctx, const ValuesPlanNode *plan);
 
-  /** Initialize the values */
+  /** 初始化 values */
   void Init() override;
 
   /**
-   * Yield the next tuple from the values.
-   * @param[out] tuple The next tuple produced by the values
-   * @param[out] rid The next tuple RID produced by the values, not used by values executor
-   * @return `true` if a tuple was produced, `false` if there are no more tuples
+   * 从 values 中产生下一行元组。
+   * @param[out] tuple 由 values 产生的下一行元组
+   * @param[out] rid 由 values 产生的下一行元组的 RID，values 执行器不使用该字段
+   * @return 如果产生了元组则返回 `true`，如果没有更多元组则返回 `false`
    */
   auto Next(Tuple *tuple, RID *rid) -> bool override;
 
-  /** @return The output schema for the values */
+  /** @return values 计划的输出模式 */
   auto GetOutputSchema() const -> const Schema & override { return plan_->OutputSchema(); }
 
  private:
-  /** The values plan node to be executed */
+  /** 要执行的 values 计划节点 */
   const ValuesPlanNode *plan_;
 
   const Schema dummy_schema_;

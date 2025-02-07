@@ -22,41 +22,46 @@
 
 namespace bustub {
 
-/**
- * InsertExecutor executes an insert on a table.
- * Inserted values are always pulled from a child executor.
- */
-class InsertExecutor : public AbstractExecutor {
- public:
   /**
-   * Construct a new InsertExecutor instance.
-   * @param exec_ctx The executor context
-   * @param plan The insert plan to be executed
-   * @param child_executor The child executor from which inserted tuples are pulled
+   * InsertExecutor 执行在表上的插入操作。
+   * 插入的值始终来自子执行器。
    */
-  InsertExecutor(ExecutorContext *exec_ctx, const InsertPlanNode *plan,
-                 std::unique_ptr<AbstractExecutor> &&child_executor);
+  class InsertExecutor : public AbstractExecutor {
+   public:
+    /**
+     * 构造一个新的 InsertExecutor 实例。
+     * @param exec_ctx 执行器上下文
+     * @param plan 要执行的插入计划
+     * @param child_executor 从中提取插入元组的子执行器
+     */
+    InsertExecutor(ExecutorContext *exec_ctx, const InsertPlanNode *plan,
+                   std::unique_ptr<AbstractExecutor> &&child_executor);
 
-  /** Initialize the insert */
-  void Init() override;
+    /** 初始化插入操作 */
+    void Init() override;
 
-  /**
-   * Yield the number of rows inserted into the table.
-   * @param[out] tuple The integer tuple indicating the number of rows inserted into the table
-   * @param[out] rid The next tuple RID produced by the insert (ignore, not used)
-   * @return `true` if a tuple was produced, `false` if there are no more tuples
-   *
-   * NOTE: InsertExecutor::Next() does not use the `rid` out-parameter.
-   * NOTE: InsertExecutor::Next() returns true with number of inserted rows produced only once.
-   */
-  auto Next([[maybe_unused]] Tuple *tuple, RID *rid) -> bool override;
+    /**
+     * 返回插入到表中的行数。
+     * @param[out] tuple 一个整数元组，表示插入到表中的行数
+     * @param[out] rid 插入操作产生的下一个元组 RID（忽略，不使用）
+     * @return 如果生成了元组，则返回 `true`；如果没有更多元组，则返回 `false`
+     *
+     * 注意：InsertExecutor::Next() 不使用 `rid` 输出参数。
+     * 注意：InsertExecutor::Next() 仅在插入的行数产生时返回 `true`。
+     */
+    auto Next([[maybe_unused]] Tuple *tuple, RID *rid) -> bool override;
 
-  /** @return The output schema for the insert */
-  auto GetOutputSchema() const -> const Schema & override { return plan_->OutputSchema(); };
+    /** @return 插入操作的输出模式 */
+    auto GetOutputSchema() const -> const Schema & override { return plan_->OutputSchema(); };
 
- private:
-  /** The insert plan node to be executed*/
-  const InsertPlanNode *plan_;
-};
+   private:
+    /** 要执行的插入计划节点 */
+    const InsertPlanNode *plan_;
+    /** The child executor from which tuples are obtained */
+    std::unique_ptr<AbstractExecutor> child_executor_;
+    // 插入结束后得手动终止
+    bool insert_finish_;
+  };
 
 }  // namespace bustub
+

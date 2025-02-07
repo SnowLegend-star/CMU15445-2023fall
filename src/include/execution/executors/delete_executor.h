@@ -24,42 +24,42 @@
 namespace bustub {
 
 /**
- * DeletedExecutor executes a delete on a table.
- * Deleted values are always pulled from a child.
+ * DeleteExecutor 执行一个表的删除操作。
+ * 被删除的值总是从子执行器中获取。
  */
 class DeleteExecutor : public AbstractExecutor {
  public:
   /**
-   * Construct a new DeleteExecutor instance.
-   * @param exec_ctx The executor context
-   * @param plan The delete plan to be executed
-   * @param child_executor The child executor that feeds the delete
+   * 构造一个新的 DeleteExecutor 实例。
+   * @param exec_ctx 执行器上下文
+   * @param plan 要执行的删除计划
+   * @param child_executor 提供删除操作的子执行器
    */
   DeleteExecutor(ExecutorContext *exec_ctx, const DeletePlanNode *plan,
                  std::unique_ptr<AbstractExecutor> &&child_executor);
 
-  /** Initialize the delete */
+  /** 初始化删除操作 */
   void Init() override;
 
   /**
-   * Yield the number of rows deleted from the table.
-   * @param[out] tuple The integer tuple indicating the number of rows deleted from the table
-   * @param[out] rid The next tuple RID produced by the delete (ignore, not used)
-   * @return `true` if a tuple was produced, `false` if there are no more tuples
+   * 返回删除的行数。
+   * @param[out] tuple 一个整数元组，表示删除的行数
+   * @param[out] rid 删除操作生成的下一个元组的RID（忽略，不使用）
+   * @return 如果产生了一个元组，返回 `true`，如果没有更多元组，返回 `false`
    *
-   * NOTE: DeleteExecutor::Next() does not use the `rid` out-parameter.
-   * NOTE: DeleteExecutor::Next() returns true with the number of deleted rows produced only once.
+   * 注意：DeleteExecutor::Next() 仅在删除操作执行一次后返回删除的行数。
    */
   auto Next([[maybe_unused]] Tuple *tuple, RID *rid) -> bool override;
 
-  /** @return The output schema for the delete */
+  /** @return 删除操作的输出模式 */
   auto GetOutputSchema() const -> const Schema & override { return plan_->OutputSchema(); };
 
  private:
-  /** The delete plan node to be executed */
+  /** 要执行的删除计划节点 */
   const DeletePlanNode *plan_;
 
-  /** The child executor from which RIDs for deleted tuples are pulled */
+  /** 从中获取删除元组 RID 的子执行器 */
   std::unique_ptr<AbstractExecutor> child_executor_;
+  bool delete_finish_; //手动设置只执行一次的flag
 };
 }  // namespace bustub

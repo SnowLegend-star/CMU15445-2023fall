@@ -77,6 +77,7 @@ class PlannerContext {
 /**
  * The planner takes a bound statement, and transforms it into the BusTub plan tree.
  * The plan tree will be taken by the execution engine to execute the statement.
+ * plan-tree会被execution engine用来执行statement
  */
 class Planner {
  public:

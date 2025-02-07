@@ -88,7 +88,7 @@ void WritePageGuard::Drop() {
   if (guard.page_ != nullptr) {
     guard.bpm_->UnpinPage(guard.PageId(), guard.is_dirty_);
     guard.page_->WUnlatch();
-    std::cout << "page_id: " << guard.PageId() << "释放写锁" << std::endl;
+    // std::cout << "page_id: " << guard.PageId() << "释放写锁" << std::endl;
   }
   guard.page_ = nullptr;
   guard.bpm_ = nullptr;

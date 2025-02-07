@@ -37,13 +37,15 @@ enum class LogicType { And, Or };
 class LogicExpression : public AbstractExpression {
  public:
   /** Creates a new comparison expression representing (left comp_type right). */
+  /** 接受 两个子表达式（left 和 right） 这两子表达式都是bool类型**/
   LogicExpression(AbstractExpressionRef left, AbstractExpressionRef right, LogicType logic_type)
       : AbstractExpression({std::move(left), std::move(right)}, TypeId::BOOLEAN), logic_type_{logic_type} {
     if (GetChildAt(0)->GetReturnType() != TypeId::BOOLEAN || GetChildAt(1)->GetReturnType() != TypeId::BOOLEAN) {
       throw bustub::NotImplementedException("expect boolean from either side");
     }
   }
-
+  
+  /** 这两子表达式都是bool类型**/
   auto Evaluate(const Tuple *tuple, const Schema &schema) const -> Value override {
     Value lhs = GetChildAt(0)->Evaluate(tuple, schema);
     Value rhs = GetChildAt(1)->Evaluate(tuple, schema);

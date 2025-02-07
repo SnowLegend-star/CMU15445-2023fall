@@ -48,60 +48,67 @@ static_assert(sizeof(TupleMeta) == TUPLE_META_SIZE);
  * | FIXED-SIZE or VARIED-SIZED OFFSET | PAYLOAD OF VARIED-SIZED FIELD |
  * ---------------------------------------------------------------------
  */
+
+/**
+ * 元组格式：
+ * ---------------------------------------------------------------------
+ * | 固定大小或变动大小偏移量 | 变动大小字段的有效载荷 |
+ * ---------------------------------------------------------------------
+ */
 class Tuple {
   friend class TablePage;
   friend class TableHeap;
   friend class TableIterator;
 
  public:
-  // Default constructor (to create a dummy tuple)
+  // 默认构造函数（用于创建一个虚拟元组）
   Tuple() = default;
 
-  // constructor for table heap tuple
+  // 用于表堆元组的构造函数
   explicit Tuple(RID rid) : rid_(rid) {}
 
   static auto Empty() -> Tuple { return Tuple{RID{INVALID_PAGE_ID, 0}}; }
 
-  // constructor for creating a new tuple based on input value
+  // 根据输入值创建一个新的元组
   Tuple(std::vector<Value> values, const Schema *schema);
 
   Tuple(const Tuple &other) = default;
 
-  // move constructor
+  // 移动构造函数
   Tuple(Tuple &&other) noexcept = default;
 
-  // assign operator, deep copy
+  // 赋值操作符，深拷贝
   auto operator=(const Tuple &other) -> Tuple & = default;
 
-  // move assignment
+  // 移动赋值操作符
   auto operator=(Tuple &&other) noexcept -> Tuple & = default;
 
-  // serialize tuple data
+  // 序列化元组数据
   void SerializeTo(char *storage) const;
 
-  // deserialize tuple data(deep copy)
+  // 反序列化元组数据（深拷贝）
   void DeserializeFrom(const char *storage);
 
-  // return RID of current tuple
+  // 返回当前元组的RID
   inline auto GetRid() const -> RID { return rid_; }
 
-  // return RID of current tuple
+  // 设置当前元组的RID
   inline auto SetRid(RID rid) { rid_ = rid; }
 
-  // Get the address of this tuple in the table's backing store
+  // 获取该元组在表的备份存储中的地址
   inline auto GetData() const -> const char * { return data_.data(); }
 
-  // Get length of the tuple, including varchar length
+  // 获取元组的长度，包括varchar的长度
   inline auto GetLength() const -> uint32_t { return data_.size(); }
 
-  // Get the value of a specified column (const)
-  // checks the schema to see how to return the Value.
+  // 获取指定列的值（常量）
+  // 检查模式，以确定如何返回值。
   auto GetValue(const Schema *schema, uint32_t column_idx) const -> Value;
 
-  // Generates a key tuple given schemas and attributes
+  // 根据模式和属性生成一个键元组
   auto KeyFromTuple(const Schema &schema, const Schema &key_schema, const std::vector<uint32_t> &key_attrs) -> Tuple;
 
-  // Is the column value null ?
+  // 列值是否为null？
   inline auto IsNull(const Schema *schema, uint32_t column_idx) const -> bool {
     Value value = GetValue(schema, column_idx);
     return value.IsNull();
@@ -112,10 +119,10 @@ class Tuple {
   friend inline auto IsTupleContentEqual(const Tuple &a, const Tuple &b) { return a.data_ == b.data_; }
 
  private:
-  // Get the starting storage address of specific column
+  // 获取特定列的起始存储地址
   auto GetDataPtr(const Schema *schema, uint32_t column_idx) const -> const char *;
 
-  RID rid_{};  // if pointing to the table heap, the rid is valid
+  RID rid_{};  // 如果指向表堆，RID是有效的
   std::vector<char> data_;
 };
 

@@ -20,13 +20,15 @@
 
 namespace bustub {
 /**
- * ConstantValueExpression represents constants.
+ * ConstantValueExpression 代表常量.
  */
 class ConstantValueExpression : public AbstractExpression {
  public:
   /** Creates a new constant value expression wrapping the given value. */
   explicit ConstantValueExpression(const Value &val) : AbstractExpression({}, val.GetTypeId()), val_(val) {}
-
+  
+  /**忽略 tuple 和 schema，直接返回 val_。
+  因为常量不依赖于数据表，它的值是固定的**/
   auto Evaluate(const Tuple *tuple, const Schema &schema) const -> Value override { return val_; }
 
   auto EvaluateJoin(const Tuple *left_tuple, const Schema &left_schema, const Tuple *right_tuple,

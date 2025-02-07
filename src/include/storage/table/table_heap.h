@@ -32,8 +32,8 @@ namespace bustub {
 class TablePage;
 
 /**
- * TableHeap represents a physical table on disk.
- * This is just a doubly-linked list of pages.
+ * TableHeap 表示磁盘上的物理表。
+ * 这只是一个双向链表的页面。
  */
 class TableHeap {
   friend class TableIterator;
@@ -42,18 +42,18 @@ class TableHeap {
   ~TableHeap() = default;
 
   /**
-   * Create a table heap without a transaction. (open table)
-   * @param buffer_pool_manager the buffer pool manager
-   * @param first_page_id the id of the first page
-   */
+  * 在没有事务的情况下创建一个表堆。（打开表）
+  * @param buffer_pool_manager 缓冲池管理器
+  * @param first_page_id 表的第一页的 ID
+  */
   explicit TableHeap(BufferPoolManager *bpm);
 
   /**
-   * Insert a tuple into the table. If the tuple is too large (>= page_size), return std::nullopt.
-   * @param meta tuple meta
-   * @param tuple tuple to insert
-   * @return rid of the inserted tuple
-   */
+  * 将一个元组插入到表中。如果元组太大（>= 页面大小），则返回 std::nullopt。
+  * @param meta 元组的元数据
+  * @param tuple 要插入的元组
+  * @return 插入的元组的 RID
+  */
   auto InsertTuple(const TupleMeta &meta, const Tuple &tuple, LockManager *lock_mgr = nullptr,
                    Transaction *txn = nullptr, table_oid_t oid = 0) -> std::optional<RID>;
 
@@ -72,19 +72,18 @@ class TableHeap {
   auto GetTuple(RID rid) -> std::pair<TupleMeta, Tuple>;
 
   /**
-   * Read a tuple meta from the table. Note: if you want to get tuple and meta together, use `GetTuple` instead
-   * to ensure atomicity.
-   * @param rid rid of the tuple to read
-   * @return the meta
-   */
+  * 从表中读取一个元组的元数据。注意：如果你想同时获取元组和元数据，请使用 `GetTuple` 以确保原子性。
+  * @param rid 要读取的元组的 rid
+  * @return 元数据
+  */
   auto GetTupleMeta(RID rid) -> TupleMeta;
 
-  /** @return the iterator of this table. When this iterator is created, it will record the current last tuple in the
-   * table heap, and the iterator will stop at that point, in order to avoid halloween problem. You usually will need to
-   * use this function for project 3. Given that you have already implemented your project 4 update executor as a
-   * pipeline breaker, you may use `MakeEagerIterator` to test whether the update executor is implemented correctly.
-   * There should be no difference between this function and `MakeEagerIterator` in project 4 if everything is
-   * implemented correctly. */
+  /** 
+  * 返回该表的迭代器。当这个迭代器被创建时，它将记录表中当前的最后一个元组，迭代器将在该点停止，
+  * 以避免万圣节问题。通常你会在项目 3 中使用这个函数。如果你已经实现了项目 4 的更新执行器作为
+  * 管道中断，你可以使用 `MakeEagerIterator` 来测试更新执行器是否正确实现。
+  * 如果一切实现正确，这个函数和项目 4 中的 `MakeEagerIterator` 应该没有区别。
+  */
   auto MakeIterator() -> TableIterator;
 
   /** @return the iterator of this table. The iterator will stop at the last tuple at the time of iterating. */
@@ -94,13 +93,13 @@ class TableHeap {
   inline auto GetFirstPageId() const -> page_id_t { return first_page_id_; }
 
   /**
-   * Update a tuple in place. Should NOT be used in project 3. Implement your project 3 update executor as delete and
-   * insert. You will need to use this function in project 4.
-   * @param meta new tuple meta
-   * @param tuple  new tuple
-   * @param rid the rid of the tuple to be updated
-   * @param check the check to run before actually update.
-   */
+  * 就地更新一个元组。这个函数不应在项目 3 中使用。请在项目 3 中将更新执行器实现为删除和插入。
+  * 你将在项目 4 中使用这个函数。
+  * @param meta 新的元组元数据
+  * @param tuple 新的元组
+  * @param rid 要更新的元组的 rid
+  * @param check 在实际更新之前要运行的检查
+  */
   auto UpdateTupleInPlace(const TupleMeta &meta, const Tuple &tuple, RID rid,
                           std::function<bool(const TupleMeta &meta, const Tuple &table, RID rid)> &&check = nullptr)
       -> bool;
@@ -112,11 +111,11 @@ class TableHeap {
     return std::unique_ptr<TableHeap>(new TableHeap(create_table_heap));
   }
 
-  // The below functions are useful only when you want to implement abort in a way that removes an undo log from the
-  // version chain. DO NOT USE THEM if you are unsure what they are supposed to do.
+  // 以下函数仅在你想实现撤销时删除版本链中的撤销日志时有用。
+  // 如果你不确定这些函数的作用，请不要使用它们。
   //
-  // And if you decide to use the below functions, DO NOT use the normal ones like `GetTuple`. Having two read locks
-  // on the same thing in one thread might cause deadlocks.
+  // 如果你决定使用以下函数，千万不要使用像 `GetTuple` 这样的普通函数。
+  // 在一个线程中对同一对象使用两个读取锁可能会导致死锁。
 
   auto AcquireTablePageReadLock(RID rid) -> ReadPageGuard;
 

@@ -35,57 +35,58 @@ class AbstractExpression;
 using AbstractExpressionRef = std::shared_ptr<AbstractExpression>;
 
 /**
- * AbstractExpression is the base class of all the expressions in the system.
- * Expressions are modeled as trees, i.e. every expression may have a variable number of children.
+ * AbstractExpression 是系统中所有表达式的基类。
+ * 表达式被建模为树形结构，即每个表达式可能有多个子节点。
+ * 主要针对于where clause
  */
 class AbstractExpression {
  public:
   /**
-   * Create a new AbstractExpression with the given children and return type.
-   * @param children the children of this abstract expression
-   * @param ret_type the return type of this abstract expression when it is evaluated
+   * 使用给定的子节点和返回类型创建一个新的 AbstractExpression。
+   * @param children 该抽象表达式的子节点
+   * @param ret_type 该抽象表达式在求值时的返回类型
    */
   AbstractExpression(std::vector<AbstractExpressionRef> children, TypeId ret_type)
       : children_{std::move(children)}, ret_type_{ret_type} {}
 
-  /** Virtual destructor. */
+  /** 虚析构函数。 */
   virtual ~AbstractExpression() = default;
 
-  /** @return The value obtained by evaluating the tuple with the given schema */
+  /** @return 使用给定的元组和模式求值后得到的值 */
   virtual auto Evaluate(const Tuple *tuple, const Schema &schema) const -> Value = 0;
 
   /**
-   * Returns the value obtained by evaluating a JOIN.
-   * @param left_tuple The left tuple
-   * @param left_schema The left tuple's schema
-   * @param right_tuple The right tuple
-   * @param right_schema The right tuple's schema
-   * @return The value obtained by evaluating a JOIN on the left and right
+   * 返回通过评估 JOIN 操作得到的值。 跨表比较
+   * @param left_tuple 左边的元组
+   * @param left_schema 左边元组的模式
+   * @param right_tuple 右边的元组
+   * @param right_schema 右边元组的模式
+   * @return 通过在左右元组上执行 JOIN 得到的值
    */
   virtual auto EvaluateJoin(const Tuple *left_tuple, const Schema &left_schema, const Tuple *right_tuple,
                             const Schema &right_schema) const -> Value = 0;
 
-  /** @return the child_idx'th child of this expression */
+  /** @return 该表达式的第 child_idx 个子节点 */
   auto GetChildAt(uint32_t child_idx) const -> const AbstractExpressionRef & { return children_[child_idx]; }
 
-  /** @return the children of this expression, ordering may matter */
+  /** @return 该表达式的所有子节点，子节点的顺序可能很重要 */
   auto GetChildren() const -> const std::vector<AbstractExpressionRef> & { return children_; }
 
-  /** @return the type of this expression if it were to be evaluated */
+  /** @return 如果该表达式被求值时返回的类型 */
   virtual auto GetReturnType() const -> TypeId { return ret_type_; }
 
-  /** @return the string representation of the plan node and its children */
+  /** @return 该计划节点及其子节点的字符串表示 */
   virtual auto ToString() const -> std::string { return "<unknown>"; }
 
-  /** @return a new expression with new children */
+  /** @return 一个具有新子节点的新的表达式 */
   virtual auto CloneWithChildren(std::vector<AbstractExpressionRef> children) const
       -> std::unique_ptr<AbstractExpression> = 0;
 
-  /** The children of this expression. Note that the order of appearance of children may matter. */
+  /** 该表达式的子节点。注意，子节点的出现顺序可能很重要。 */
   std::vector<AbstractExpressionRef> children_;
 
  private:
-  /** The return type of this expression. */
+  /** 该表达式的返回类型。 */
   TypeId ret_type_;
 };
 

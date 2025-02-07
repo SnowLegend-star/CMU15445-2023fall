@@ -49,6 +49,10 @@ static constexpr uint64_t TABLE_PAGE_HEADER_SIZE = 8;
  * | meta | data |
  */
 
+
+/*
+* 在某个page中，从后往前插入tuple。见Lecture 04
+*/
 class TablePage {
  public:
   /**

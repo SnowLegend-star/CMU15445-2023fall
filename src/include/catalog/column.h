@@ -31,9 +31,9 @@ class Column {
 
  public:
   /**
-   * Non-variable-length constructor for creating a Column.
-   * @param column_name name of the column
-   * @param type type of the column
+   * 非可变长度构造函数，用于创建列。
+   * @param column_name 列的名称
+   * @param type 列的数据类型
    */
   Column(std::string column_name, TypeId type)
       : column_name_(std::move(column_name)), column_type_(type), fixed_length_(TypeSize(type)) {
@@ -41,11 +41,11 @@ class Column {
   }
 
   /**
-   * Variable-length constructor for creating a Column.
-   * @param column_name name of the column
-   * @param type type of column
-   * @param length length of the varlen
-   * @param expr expression used to create this column
+   * 可变长度构造函数，用于创建列。
+   * @param column_name 列的名称
+   * @param type 列的数据类型
+   * @param length 可变长度的长度
+   * @param expr 创建该列使用的表达式
    */
   Column(std::string column_name, TypeId type, uint32_t length)
       : column_name_(std::move(column_name)),
@@ -56,9 +56,9 @@ class Column {
   }
 
   /**
-   * Replicate a Column with a different name.
-   * @param column_name name of the column
-   * @param column the original column
+   * 复制一个列并更改名称。
+   * @param column_name 新的列名
+   * @param column 原始列
    */
   Column(std::string column_name, const Column &column)
       : column_name_(std::move(column_name)),
@@ -67,10 +67,10 @@ class Column {
         variable_length_(column.variable_length_),
         column_offset_(column.column_offset_) {}
 
-  /** @return column name */
+  /** @return 列的名称 */
   auto GetName() const -> std::string { return column_name_; }
 
-  /** @return column length */
+  /** @return 列的长度 */
   auto GetLength() const -> uint32_t {
     if (IsInlined()) {
       return fixed_length_;
@@ -78,29 +78,29 @@ class Column {
     return variable_length_;
   }
 
-  /** @return column fixed length */
+  /** @return 列的固定长度 */
   auto GetFixedLength() const -> uint32_t { return fixed_length_; }
 
-  /** @return column variable length */
+  /** @return 列的可变长度 */
   auto GetVariableLength() const -> uint32_t { return variable_length_; }
 
-  /** @return column's offset in the tuple */
+  /** @return 列在元组中的偏移量 */
   auto GetOffset() const -> uint32_t { return column_offset_; }
 
-  /** @return column type */
+  /** @return 列的数据类型 */
   auto GetType() const -> TypeId { return column_type_; }
 
-  /** @return true if column is inlined, false otherwise */
+  /** @return 如果列是内联的，返回 true，否则返回 false */
   auto IsInlined() const -> bool { return column_type_ != TypeId::VARCHAR; }
 
-  /** @return a string representation of this column */
+  /** @return 列的字符串表示 */
   auto ToString(bool simplified = true) const -> std::string;
 
  private:
   /**
-   * Return the size in bytes of the type.
-   * @param type type whose size is to be determined
-   * @return size in bytes
+   * 返回类型的字节大小。
+   * @param type 需要确定大小的类型
+   * @return 类型的字节大小
    */
   static auto TypeSize(TypeId type) -> uint8_t {
     switch (type) {
@@ -116,29 +116,30 @@ class Column {
       case TypeId::TIMESTAMP:
         return 8;
       case TypeId::VARCHAR:
-        // TODO(Amadou): Confirm this.
+        // TODO(Amadou): 确认这个大小。
         return 12;
       default: {
-        UNREACHABLE("Cannot get size of invalid type");
+        UNREACHABLE("Cannot get size of invalid type. ");
       }
     }
   }
 
-  /** Column name. */
+  /** 列的名称。 */
   std::string column_name_;
 
-  /** Column value's type. */
+  /** 列值的类型。 */
   TypeId column_type_;
 
-  /** For a non-inlined column, this is the size of a pointer. Otherwise, the size of the fixed length column. */
+  /** 对于非内联列，这是指针的大小。否则，为固定长度列的大小。 */
   uint32_t fixed_length_;
 
-  /** For an inlined column, 0. Otherwise, the length of the variable length column. */
+  /** 对于内联列，值为 0。否则，为可变长度列的长度。 */
   uint32_t variable_length_{0};
 
-  /** Column offset in the tuple. */
+  /** 列在元组中的偏移量。 */
   uint32_t column_offset_{0};
 };
+
 
 }  // namespace bustub
 

@@ -34,9 +34,11 @@ enum class StringExpressionType { Lower, Upper };
 
 /**
  * StringExpression represents two expressions being computed.
+ * 通俗来说就是把输入的字符串转化为大/小写
  */
 class StringExpression : public AbstractExpression {
  public:
+ /** 接收一个VARCHAR类型的表达式 **/
   StringExpression(AbstractExpressionRef arg, StringExpressionType expr_type)
       : AbstractExpression({std::move(arg)}, TypeId::VARCHAR), expr_type_{expr_type} {
     if (GetChildAt(0)->GetReturnType() != TypeId::VARCHAR) {

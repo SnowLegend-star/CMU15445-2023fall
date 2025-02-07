@@ -10,6 +10,7 @@
 #include "linenoise/linenoise.h"
 #include "utf8proc/utf8proc.h"
 
+// 计算 UTF-8 编码字符串的显示宽度
 auto GetWidthOfUtf8(const void *beg, const void *end, size_t *width) -> int {
   size_t computed_width = 0;
   utf8proc_ssize_t n;
@@ -47,7 +48,7 @@ auto main(int argc, char **argv) -> int {
     }
   }
 
-  bustub->GenerateMockTable();
+  bustub->GenerateMockTable();  // 生成默认的那19张表
 
   if (bustub->buffer_pool_manager_ != nullptr) {
     bustub->GenerateTestTable();
@@ -57,8 +58,8 @@ auto main(int argc, char **argv) -> int {
 
   std::cout << "Welcome to the BusTub shell! Type \\help to learn more." << std::endl << std::endl;
 
-  linenoiseHistorySetMaxLen(1024);
-  linenoiseSetMultiLine(1);
+  linenoiseHistorySetMaxLen(1024);  // 设置用户指令(ls、cd)历史记录的最大长度
+  linenoiseSetMultiLine(1); // 是否启用多行输入模式
 
   auto prompt = use_emoji_prompt ? emoji_prompt : default_prompt;
 
@@ -82,7 +83,7 @@ auto main(int argc, char **argv) -> int {
         if (query_c_str == nullptr) {
           return 0;
         }
-        query += query_c_str;
+        query += query_c_str; // 在多行输入的模式中, 将获取的输入追加到 query 字符串中
         linenoiseFree(query_c_str);
         if (bustub::StringUtil::EndsWith(query, ";") || bustub::StringUtil::StartsWith(query, "\\")) {
           break;

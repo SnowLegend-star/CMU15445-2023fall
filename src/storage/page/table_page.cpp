@@ -36,9 +36,9 @@ auto TablePage::GetNextTupleOffset(const TupleMeta &meta, const Tuple &tuple) co
   } else {
     slot_end_offset = BUSTUB_PAGE_SIZE;
   }
-  auto tuple_offset = slot_end_offset - tuple.GetLength();
-  auto offset_size = TABLE_PAGE_HEADER_SIZE + TUPLE_INFO_SIZE * (num_tuples_ + 1);
-  if (tuple_offset < offset_size) {
+  auto tuple_offset = slot_end_offset - tuple.GetLength();  // 在page中，从后往前计算
+  auto offset_size = TABLE_PAGE_HEADER_SIZE + TUPLE_INFO_SIZE * (num_tuples_ + 1); // 从前往后计算
+  if (tuple_offset < offset_size) { // 二者不同出现重叠区域
     return std::nullopt;
   }
   return tuple_offset;

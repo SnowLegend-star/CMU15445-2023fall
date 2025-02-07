@@ -6,7 +6,7 @@
 // Starter rule can be forcibly enabled by `set force_optimizer_starter_rule=yes`.
 
 namespace bustub {
-
+// 自定义的优化方法
 auto Optimizer::OptimizeCustom(const AbstractPlanNodeRef &plan) -> AbstractPlanNodeRef {
   auto p = plan;
   p = OptimizeMergeProjection(p);

@@ -57,17 +57,17 @@ class AbstractPlanNode;
 using AbstractPlanNodeRef = std::shared_ptr<const AbstractPlanNode>;
 
 /**
- * AbstractPlanNode represents all the possible types of plan nodes in our system.
- * Plan nodes are modeled as trees, so each plan node can have a variable number of children.
- * Per the Volcano model, the plan node receives the tuples of its children.
- * The ordering of the children may matter.
+ * AbstractPlanNode 表示我们系统中所有可能的计划节点类型。
+ * 计划节点被建模为树形结构，因此每个计划节点可以有多个子节点。
+ * 根据火山模型，每个计划节点接收其子节点的元组。
+ * 子节点的顺序可能很重要。
  */
 class AbstractPlanNode {
  public:
   /**
-   * Create a new AbstractPlanNode with the specified output schema and children.
-   * @param output_schema The schema for the output of this plan node
-   * @param children The children of this plan node
+   * 使用指定的输出模式和子节点创建一个新的 AbstractPlanNode。
+   * @param output_schema 该计划节点输出的模式
+   * @param children 该计划节点的子节点
    */
   AbstractPlanNode(SchemaRef output_schema, std::vector<AbstractPlanNodeRef> children)
       : output_schema_(std::move(output_schema)), children_(std::move(children)) {}
@@ -82,6 +82,7 @@ class AbstractPlanNode {
   auto GetChildAt(uint32_t child_idx) const -> AbstractPlanNodeRef { return children_[child_idx]; }
 
   /** @return the children of this plan node */
+  /** 返回类型其实也是plan, 只是属于plan而已**/
   auto GetChildren() const -> const std::vector<AbstractPlanNodeRef> & { return children_; }
 
   /** @return the type of this plan node */
@@ -100,8 +101,8 @@ class AbstractPlanNode {
       -> std::unique_ptr<AbstractPlanNode> = 0;
 
   /**
-   * The schema for the output of this plan node. In the volcano model, every plan node will spit out tuples,
-   * and this tells you what schema this plan node's tuples will have.
+   * 该计划节点输出的模式。在火山模型中，每个计划节点都会输出元组，
+   * 而该模式告诉你该节点输出元组的结构。
    */
   SchemaRef output_schema_;
 
@@ -120,6 +121,11 @@ class AbstractPlanNode {
 
 }  // namespace bustub
 
+/*
+fmt::formatter 是一个用于格式化输出的结构体。
+对于 AbstractPlanNode 及其派生类的格式化，我们提供了一个特化版本，
+能够将它们的 ToString 方法输出为字符串格式。
+*/
 template <typename T>
 struct fmt::formatter<T, std::enable_if_t<std::is_base_of<bustub::AbstractPlanNode, T>::value, char>>
     : fmt::formatter<std::string> {

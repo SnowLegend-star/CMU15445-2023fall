@@ -18,10 +18,10 @@
 namespace bustub {
 class ExecutorContext;
 /**
- * The AbstractExecutor implements the Volcano tuple-at-a-time iterator model.
- * This is the base class from which all executors in the BustTub execution
- * engine inherit, and defines the minimal interface that all executors support.
+ * AbstractExecutor 实现了 Volcano 模型中的逐元组迭代器模式。
+ * 这是 Bustub 执行引擎中所有执行器的基类，定义了所有执行器必须支持的最小接口。
  */
+
 class AbstractExecutor {
  public:
   /**
@@ -40,10 +40,10 @@ class AbstractExecutor {
   virtual void Init() = 0;
 
   /**
-   * Yield the next tuple from this executor.
-   * @param[out] tuple The next tuple produced by this executor
-   * @param[out] rid The next tuple RID produced by this executor
-   * @return `true` if a tuple was produced, `false` if there are no more tuples
+   * 从此执行器获取下一个元组。
+   * @param[out] tuple 此执行器生成的下一个元组
+   * @param[out] rid 此执行器生成的下一个元组的 RID（记录 ID）
+   * @return 如果生成了元组，则返回 `true`；如果没有更多元组，则返回 `false`
    */
   virtual auto Next(Tuple *tuple, RID *rid) -> bool = 0;
 

@@ -30,9 +30,9 @@ namespace bustub {
 class SeqScanPlanNode : public AbstractPlanNode {
  public:
   /**
-   * Construct a new SeqScanPlanNode instance.
-   * @param output The output schema of this sequential scan plan node
-   * @param table_oid The identifier of table to be scanned
+   * 构造一个新的 SeqScanPlanNode 实例。
+   * @param output 该顺序扫描计划节点的输出模式
+   * @param table_oid 要扫描的表的标识符
    */
   SeqScanPlanNode(SchemaRef output, table_oid_t table_oid, std::string table_name,
                   AbstractExpressionRef filter_predicate = nullptr)

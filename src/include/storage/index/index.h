@@ -26,23 +26,21 @@ namespace bustub {
 class Transaction;
 
 /**
- * class IndexMetadata - Holds metadata of an index object.
+ * class IndexMetadata - 保存索引对象的元数据。
  *
- * The metadata object maintains the tuple schema and key attribute of an
- * index, since the external callers does not know the actual structure of
- * the index key, so it is the index's responsibility to maintain such a
- * mapping relation and does the conversion between tuple key and index key
+ * 元数据对象维护索引的元组模式和键属性，因为外部调用者不知道实际的
+ * 索引键结构，因此索引有责任维护这种映射关系，并在元组键和索引键之间进行转换。
  */
 class IndexMetadata {
  public:
   IndexMetadata() = delete;
 
   /**
-   * Construct a new IndexMetadata instance.
-   * @param index_name The name of the index
-   * @param table_name The name of the table on which the index is created
-   * @param tuple_schema The schema of the indexed key
-   * @param key_attrs The mapping from indexed columns to base table columns
+   * 构造一个新的 IndexMetadata 实例。
+   * @param index_name 索引的名称
+   * @param table_name 索引创建所在的表的名称
+   * @param tuple_schema 被索引键的模式
+   * @param key_attrs 索引列与基础表列的映射关系
    */
   IndexMetadata(std::string index_name, std::string table_name, const Schema *tuple_schema,
                 std::vector<uint32_t> key_attrs, bool is_primary_key)
@@ -55,34 +53,34 @@ class IndexMetadata {
 
   ~IndexMetadata() = default;
 
-  /** @return The name of the index */
+  /** @return 索引的名称 */
   inline auto GetName() const -> const std::string & { return name_; }
 
-  /** @return The name of the table on which the index is created */
+  /** @return 索引创建所在表的名称 */
   inline auto GetTableName() -> const std::string & { return table_name_; }
 
-  /** @return A schema object pointer that represents the indexed key */
+  /** @return 一个表示索引键的模式对象指针 */
   inline auto GetKeySchema() const -> Schema * { return key_schema_.get(); }
 
   /**
-   * @return The number of columns inside index key (not in tuple key)
+   * @return 索引键中的列数（不包括元组键中的列）
    *
-   * NOTE: this must be defined inside the cpp source file because it
-   * uses the member of catalog::Schema which is not known here.
+   * 注意：此函数必须在 cpp 源文件中定义，因为它使用了 catalog::Schema 中的成员，
+   * 该成员在这里不可见。
    */
   auto GetIndexColumnCount() const -> std::uint32_t { return static_cast<uint32_t>(key_attrs_.size()); }
 
-  /** @return The mapping relation between indexed columns and base table columns */
+  /** @return 索引列与基础表列的映射关系 */
   inline auto GetKeyAttrs() const -> const std::vector<uint32_t> & { return key_attrs_; }
 
-  /** @return is primary key */
+  /** @return 是否是主键 */
   inline auto IsPrimaryKey() const -> bool { return is_primary_key_; }
 
-  /** @return A string representation for debugging */
+  /** @return 用于调试的字符串表示 */
   auto ToString() const -> std::string {
     std::stringstream os;
 
-    os << "IndexMetadata["
+    os << "IndexMetadata[" 
        << "Name = " << name_ << ", "
        << "Type = B+Tree, "
        << "Table name = " << table_name_ << "] :: ";
@@ -92,62 +90,58 @@ class IndexMetadata {
   }
 
  private:
-  /** The name of the index */
+  /** 索引的名称 */
   std::string name_;
-  /** The name of the table on which the index is created */
+  /** 索引创建所在的表的名称 */
   std::string table_name_;
-  /** The mapping relation between key schema and tuple schema */
+  /** 键模式与元组模式之间的映射关系 */
   const std::vector<uint32_t> key_attrs_;
-  /** The schema of the indexed key */
+  /** 索引键的模式 */
   std::shared_ptr<Schema> key_schema_;
-  /** Is primary key? */
+  /** 是否为主键 */
   bool is_primary_key_;
 };
 
 /////////////////////////////////////////////////////////////////////
-// Index class definition
+// 索引类定义
 /////////////////////////////////////////////////////////////////////
 
 /**
- * class Index - Base class for derived indices of different types
+ * class Index - 各种类型的索引的基类
  *
- * The index structure majorly maintains information on the schema of the
- * underlying table and the mapping relation between index key
- * and tuple key, and provides an abstracted way for the external world to
- * interact with the underlying index implementation without exposing
- * the actual implementation's interface.
+ * 索引结构主要维护底层表的模式信息，以及索引键和元组键之间的映射关系，
+ * 提供了一种抽象的方式供外部世界与底层索引实现交互，而不暴露
+ * 实际实现的接口。
  *
- * Index object also handles predicate scan, in addition to simple insert,
- * delete, predicate insert, point query, and full index scan. Predicate scan
- * only supports conjunction, and may or may not be optimized depending on
- * the type of expressions inside the predicate.
+ * 索引对象还处理谓词扫描，除了简单的插入、删除、谓词插入、点查询和完整索引扫描。
+ * 谓词扫描仅支持合取式，并且可能根据谓词中表达式的类型进行优化。
  */
 class Index {
  public:
   /**
-   * Construct a new Index instance.
-   * @param metadata An owning pointer to the index metadata
+   * 构造一个新的 Index 实例。
+   * @param metadata 索引元数据的拥有指针
    */
   explicit Index(std::unique_ptr<IndexMetadata> &&metadata) : metadata_{std::move(metadata)} {}
 
   virtual ~Index() = default;
 
-  /** @return A non-owning pointer to the metadata object associated with the index */
+  /** @return 一个指向与索引关联的元数据对象的非拥有指针 */
   auto GetMetadata() const -> IndexMetadata * { return metadata_.get(); }
 
-  /** @return The number of indexed columns */
+  /** @return 索引列的数量 */
   auto GetIndexColumnCount() const -> std::uint32_t { return metadata_->GetIndexColumnCount(); }
 
-  /** @return The index name */
+  /** @return 索引的名称 */
   auto GetName() const -> const std::string & { return metadata_->GetName(); }
 
-  /** @return The index key schema */
+  /** @return 索引键的模式 */
   auto GetKeySchema() const -> Schema * { return metadata_->GetKeySchema(); }
 
-  /** @return The index key attributes */
+  /** @return 索引键的属性 */
   auto GetKeyAttrs() const -> const std::vector<uint32_t> & { return metadata_->GetKeyAttrs(); }
 
-  /** @return A string representation for debugging */
+  /** @return 用于调试的字符串表示 */
   auto ToString() const -> std::string {
     std::stringstream os;
     os << "INDEX: (" << GetName() << ")";
@@ -156,36 +150,36 @@ class Index {
   }
 
   ///////////////////////////////////////////////////////////////////
-  // Point Modification
+  // 点修改
   ///////////////////////////////////////////////////////////////////
 
   /**
-   * Insert an entry into the index.
-   * @param key The index key
-   * @param rid The RID associated with the key
-   * @param transaction The transaction context
-   * @returns whether insertion is successful
+   * 将一个条目插入到索引中。
+   * @param key 索引键
+   * @param rid 与该键关联的 RID
+   * @param transaction 事务上下文
+   * @returns 插入是否成功
    */
   virtual auto InsertEntry(const Tuple &key, RID rid, Transaction *transaction) -> bool = 0;
 
   /**
-   * Delete an index entry by key.
-   * @param key The index key
-   * @param rid The RID associated with the key (unused)
-   * @param transaction The transaction context
+   * 通过键删除索引条目。
+   * @param key 索引键
+   * @param rid 与该键关联的 RID（未使用）
+   * @param transaction 事务上下文
    */
   virtual void DeleteEntry(const Tuple &key, RID rid, Transaction *transaction) = 0;
 
   /**
-   * Search the index for the provided key.
-   * @param key The index key
-   * @param result The collection of RIDs that is populated with results of the search
-   * @param transaction The transaction context
+   * 在索引中查找提供的键。
+   * @param key 索引键
+   * @param result 存放搜索结果的 RID 集合
+   * @param transaction 事务上下文
    */
   virtual void ScanKey(const Tuple &key, std::vector<RID> *result, Transaction *transaction) = 0;
 
  private:
-  /** The Index structure owns its metadata */
+  /** 索引结构拥有其元数据 */
   std::unique_ptr<IndexMetadata> metadata_;
 };
 

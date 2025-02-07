@@ -9,7 +9,7 @@
 #include "optimizer/optimizer.h"
 
 namespace bustub {
-
+// 将 Filter 直接“内嵌”到 SeqScan 操作中，以减少查询计划中不必要的步骤，从而提升查询效率。
 auto Optimizer::OptimizeMergeFilterScan(const AbstractPlanNodeRef &plan) -> AbstractPlanNodeRef {
   std::vector<AbstractPlanNodeRef> children;
   for (const auto &child : plan->GetChildren()) {

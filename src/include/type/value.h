@@ -26,11 +26,10 @@ namespace bustub {
 
 inline auto GetCmpBool(bool boolean) -> CmpBool { return boolean ? CmpBool::CmpTrue : CmpBool::CmpFalse; }
 
-// A value is an abstract class that represents a view over SQL data stored in
-// some materialized state. All values have a type and comparison functions, but
-// subclasses implement other type-specific functionality.
+// Value 类是一个抽象类，表示存储在某种具体物理状态中的 SQL 数据的视图。
+// 所有值都有类型和比较函数，但子类实现其他类型特定的功能。
 class Value {
-  // Friend Type classes
+  // 好友类型类
   friend class Type;
   friend class NumericType;
   friend class IntegerParentType;
@@ -44,28 +43,45 @@ class Value {
   friend class VarlenType;
 
  public:
+  // 构造函数，使用 TypeId 类型来初始化值
   explicit Value(const TypeId type) : manage_data_(false), type_id_(type) { size_.len_ = BUSTUB_VALUE_NULL; }
-  // BOOLEAN and TINYINT
+  
+  // 布尔值和小整数（TINYINT）
   Value(TypeId type, int8_t i);
-  // DECIMAL
+  
+  // 十进制（DECIMAL）
   Value(TypeId type, double d);
   Value(TypeId type, float f);
-  // SMALLINT
+  
+  // 小整数（SMALLINT）
   Value(TypeId type, int16_t i);
-  // INTEGER
+  
+  // 整数（INTEGER）
   Value(TypeId type, int32_t i);
-  // BIGINT
+  
+  // 大整数（BIGINT）
   Value(TypeId type, int64_t i);
-  // TIMESTAMP
+  
+  // 时间戳（TIMESTAMP）
   Value(TypeId type, uint64_t i);
-  // VARCHAR
+  
+  // 可变长度字符串（VARCHAR）
   Value(TypeId type, const char *data, uint32_t len, bool manage_data);
   Value(TypeId type, const std::string &data);
 
+  // 默认构造函数，初始化为无效类型
   Value() : Value(TypeId::INVALID) {}
+  
+  // 拷贝构造函数
   Value(const Value &other);
+  
+  // 拷贝赋值运算符
   auto operator=(Value other) -> Value &;
+  
+  // 析构函数
   ~Value();
+  
+  // 交换两个值
   // NOLINTNEXTLINE
   friend void Swap(Value &first, Value &second) {
     std::swap(first.value_, second.value_);
@@ -73,34 +89,42 @@ class Value {
     std::swap(first.manage_data_, second.manage_data_);
     std::swap(first.type_id_, second.type_id_);
   }
-  // check whether value is integer
+  
+  // 检查值是否为整数
   auto CheckInteger() const -> bool;
+  
+  // 检查该值是否可以与另一个值比较
   auto CheckComparable(const Value &o) const -> bool;
 
-  // Get the type of this value
+  // 获取值的类型
   inline auto GetTypeId() const -> TypeId { return type_id_; }
 
-  // Get the length of the variable length data
+  // 获取可变长度数据的长度
   inline auto GetLength() const -> uint32_t { return Type::GetInstance(type_id_)->GetLength(*this); }
-  // Access the raw variable length data
+
+  // 访问原始的可变长度数据
   inline auto GetData() const -> const char * { return Type::GetInstance(type_id_)->GetData(*this); }
 
+  // 类型转换：将值转换为指定的类型
   template <class T>
   inline auto GetAs() const -> T {
     return *reinterpret_cast<const T *>(&value_);
   }
 
+  // 将值转换为指定的类型
   inline auto CastAs(const TypeId type_id) const -> Value {
     return Type::GetInstance(type_id_)->CastAs(*this, type_id);
   }
-  // You will likely need this in project 4...
+  
+  // 如果两个值相等，返回 true
   inline auto CompareExactlyEquals(const Value &o) const -> bool {
     if (this->IsNull() && o.IsNull()) {
       return true;
     }
     return (Type::GetInstance(type_id_)->CompareEquals(*this, o)) == CmpBool::CmpTrue;
   }
-  // Comparison Methods
+
+  // 比较方法
   inline auto CompareEquals(const Value &o) const -> CmpBool {
     return Type::GetInstance(type_id_)->CompareEquals(*this, o);
   }
@@ -120,7 +144,7 @@ class Value {
     return Type::GetInstance(type_id_)->CompareGreaterThanEquals(*this, o);
   }
 
-  // Other mathematical functions
+  // 其他数学函数
   inline auto Add(const Value &o) const -> Value { return Type::GetInstance(type_id_)->Add(*this, o); }
   inline auto Subtract(const Value &o) const -> Value { return Type::GetInstance(type_id_)->Subtract(*this, o); }
   inline auto Multiply(const Value &o) const -> Value { return Type::GetInstance(type_id_)->Multiply(*this, o); }
@@ -130,49 +154,52 @@ class Value {
   inline auto Max(const Value &o) const -> Value { return Type::GetInstance(type_id_)->Max(*this, o); }
   inline auto Sqrt() const -> Value { return Type::GetInstance(type_id_)->Sqrt(*this); }
 
+  // 操作空值
   inline auto OperateNull(const Value &o) const -> Value { return Type::GetInstance(type_id_)->OperateNull(*this, o); }
+  
+  // 检查是否为零
   inline auto IsZero() const -> bool { return Type::GetInstance(type_id_)->IsZero(*this); }
+  
+  // 检查是否为空值
   inline auto IsNull() const -> bool { return size_.len_ == BUSTUB_VALUE_NULL; }
 
-  // Serialize this value into the given storage space. The inlined parameter
-  // indicates whether we are allowed to inline this value into the storage
-  // space, or whether we must store only a reference to this value. If inlined
-  // is false, we may use the provided data pool to allocate space for this
-  // value, storing a reference into the allocated pool space in the storage.
+  // 序列化该值到给定的存储空间。inlined 参数指示是否允许将该值内联到存储空间中，
+  // 或者仅存储该值的引用。如果 inlined 为 false，我们可能会使用提供的数据池为该值分配空间，
+  // 并将引用存储到分配的池空间中。
   inline void SerializeTo(char *storage) const { Type::GetInstance(type_id_)->SerializeTo(*this, storage); }
 
-  // Deserialize a value of the given type from the given storage space.
+  // 从给定的存储空间反序列化一个值
   inline static auto DeserializeFrom(const char *storage, const TypeId type_id) -> Value {
     return Type::GetInstance(type_id)->DeserializeFrom(storage);
   }
 
-  // Return a string version of this value
+  // 返回该值的字符串表示
   inline auto ToString() const -> std::string { return Type::GetInstance(type_id_)->ToString(*this); }
-  // Create a copy of this value
+
+  // 创建该值的副本
   inline auto Copy() const -> Value { return Type::GetInstance(type_id_)->Copy(*this); }
 
  protected:
-  // The actual value item
+  // 实际的值项
   union Val {
-    int8_t boolean_;
-    int8_t tinyint_;
-    int16_t smallint_;
-    int32_t integer_;
-    int64_t bigint_;
-    double decimal_;
-    uint64_t timestamp_;
-    char *varlen_;
-    const char *const_varlen_;
+    int8_t boolean_;      // 布尔值
+    int8_t tinyint_;      // 小整数
+    int16_t smallint_;    // 小整数
+    int32_t integer_;     // 整数
+    int64_t bigint_;      // 大整数
+    double decimal_;      // 十进制数
+    uint64_t timestamp_;  // 时间戳
+    char *varlen_;        // 可变长度字符串
+    const char *const_varlen_;  // 常量可变长度字符串
   } value_;
 
   union {
-    uint32_t len_;
-    TypeId elem_type_id_;
+    uint32_t len_;           // 长度
+    TypeId elem_type_id_;    // 元素类型
   } size_;
 
-  bool manage_data_;
-  // The data type
-  TypeId type_id_;
+  bool manage_data_;   // 是否管理数据
+  TypeId type_id_;     // 数据类型
 };
 }  // namespace bustub
 
