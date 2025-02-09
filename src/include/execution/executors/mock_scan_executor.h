@@ -27,58 +27,58 @@ extern const char *mock_table_list[];
 auto GetMockTableSchemaOf(const std::string &table) -> Schema;
 
 /**
- * The MockScanExecutor executor executes a sequential table scan for tests.
+ * MockScanExecutor 执行一个用于测试的顺序表扫描。
  */
-class MockScanExecutor : public AbstractExecutor {
- public:
-  /**
-   * Construct a new MockScanExecutor instance.
-   * @param exec_ctx The executor context
-   * @param plan The mock scan plan to be executed
-   */
-  MockScanExecutor(ExecutorContext *exec_ctx, const MockScanPlanNode *plan);
-
-  /** Initialize the mock scan. */
-  void Init() override;
-
-  /**
-   * Yield the next tuple from the sequential scan.
-   * @param[out] tuple The next tuple produced by the scan
-   * @param[out] rid The next tuple RID produced by the scan
-   * @return `true` if a tuple was produced, `false` if there are no more tuples
-   */
-  auto Next(Tuple *tuple, RID *rid) -> bool override;
-
-  /** @return The output schema for the sequential scan */
-  auto GetOutputSchema() const -> const Schema & override { return plan_->OutputSchema(); }
-
- private:
-  /** @return A dummy tuple according to the output schema */
-  auto MakeDummyTuple() const -> Tuple;
-
-  /** @return A dummy RID value */
-  static auto MakeDummyRID() -> RID;
-
-  /** MockScanExecutor::Next() returns `true` when scan is incomplete */
-  constexpr static const bool EXECUTOR_ACTIVE{true};
-
-  /** MockScanExecutor::Next() returns `false` when scan is complete */
-  constexpr static const bool EXECUTOR_EXHAUSTED{false};
-
-  /** The plan node for the scan */
-  const MockScanPlanNode *plan_;
-
-  /** The cursor for the current mock scan */
-  std::size_t cursor_{0};
-
-  /** The table function */
-  std::function<Tuple(std::size_t)> func_;
-
-  /** The size of the mock table */
-  std::size_t size_;
-
-  /** The shuffled output */
-  std::vector<size_t> shuffled_idx_;
+ class MockScanExecutor : public AbstractExecutor {
+  public:
+   /**
+    * 构造一个新的 MockScanExecutor 实例。
+    * @param exec_ctx 执行上下文
+    * @param plan 要执行的模拟扫描计划
+    */
+   MockScanExecutor(ExecutorContext *exec_ctx, const MockScanPlanNode *plan);
+ 
+   /** 初始化模拟扫描。 */
+   void Init() override;
+ 
+   /**
+    * 输出顺序扫描的下一个元组。
+    * @param[out] tuple 扫描生成的下一个元组
+    * @param[out] rid 扫描生成的下一个元组的 RID
+    * @return 如果生成了元组，返回 `true`；如果没有更多元组，返回 `false`
+    */
+   auto Next(Tuple *tuple, RID *rid) -> bool override;
+ 
+   /** @return 顺序扫描的输出模式 */
+   auto GetOutputSchema() const -> const Schema & override { return plan_->OutputSchema(); }
+ 
+  private:
+   /** @return 根据输出模式生成一个虚拟元组 */
+   auto MakeDummyTuple() const -> Tuple;
+ 
+   /** @return 一个虚拟的 RID 值 */
+   static auto MakeDummyRID() -> RID;
+ 
+   /** MockScanExecutor::Next() 在扫描未完成时返回 `true` */
+   constexpr static const bool EXECUTOR_ACTIVE{true};
+ 
+   /** MockScanExecutor::Next() 在扫描完成时返回 `false` */
+   constexpr static const bool EXECUTOR_EXHAUSTED{false};
+ 
+   /** 扫描的计划节点 */
+   const MockScanPlanNode *plan_;
+ 
+   /** 当前模拟扫描的游标 */
+   std::size_t cursor_{0};
+ 
+   /** 表的函数 */
+   std::function<Tuple(std::size_t)> func_;
+ 
+   /** 模拟表的大小 */
+   std::size_t size_;
+ 
+   /** 打乱顺序后的输出 */
+   std::vector<size_t> shuffled_idx_; 
 };
 
 }  // namespace bustub

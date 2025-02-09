@@ -23,41 +23,41 @@
 namespace bustub {
 
 /**
- * The FilterPlanNode represents a filter operation.
- * It retains any tuple that satisfies the predicate in the child.
+ * FilterPlanNode 表示一个过滤操作。
+ * 它保留任何满足子节点谓词的元组。
  */
-class FilterPlanNode : public AbstractPlanNode {
- public:
-  /**
-   * Construct a new FilterPlanNode instance.
-   * @param output The output schema of this filter plan node
-   * @param predicate The predicate applied during the scan operation
-   * @param child The child plan node
-   */
-  FilterPlanNode(SchemaRef output, AbstractExpressionRef predicate, AbstractPlanNodeRef child)
-      : AbstractPlanNode(std::move(output), {std::move(child)}), predicate_{std::move(predicate)} {}
-
-  /** @return The type of the plan node */
-  auto GetType() const -> PlanType override { return PlanType::Filter; }
-
-  /** @return The predicate to test tuples against; tuples should only be returned if they evaluate to true */
-  auto GetPredicate() const -> const AbstractExpressionRef & { return predicate_; }
-
-  /** @return The child plan node */
-  auto GetChildPlan() const -> AbstractPlanNodeRef {
-    BUSTUB_ASSERT(GetChildren().size() == 1, "Filter should have exactly one child plan.");
-    return GetChildAt(0);
-  }
-
-  BUSTUB_PLAN_NODE_CLONE_WITH_CHILDREN(FilterPlanNode);
-
-  /** The predicate that all returned tuples must satisfy */
-  AbstractExpressionRef predicate_;
-
- protected:
-  auto PlanNodeToString() const -> std::string override {
-    return fmt::format("Filter {{ predicate={} }}", *predicate_);
-  }
-};
+ class FilterPlanNode : public AbstractPlanNode {
+  public:
+   /**
+    * 构造一个新的 FilterPlanNode 实例。
+    * @param output 此过滤器计划节点的输出模式
+    * @param predicate 在扫描操作中应用的谓词
+    * @param child 子计划节点
+    */
+   FilterPlanNode(SchemaRef output, AbstractExpressionRef predicate, AbstractPlanNodeRef child)
+       : AbstractPlanNode(std::move(output), {std::move(child)}), predicate_{std::move(predicate)} {}
+ 
+   /** @return 计划节点的类型 */
+   auto GetType() const -> PlanType override { return PlanType::Filter; }
+ 
+   /** @return 用于测试元组的谓词；只有当谓词为 true 时才会返回元组 */
+   auto GetPredicate() const -> const AbstractExpressionRef & { return predicate_; }
+ 
+   /** @return 子计划节点 */
+   auto GetChildPlan() const -> AbstractPlanNodeRef {
+     BUSTUB_ASSERT(GetChildren().size() == 1, "Filter 应该只有一个子计划节点。");
+     return GetChildAt(0);
+   }
+ 
+   BUSTUB_PLAN_NODE_CLONE_WITH_CHILDREN(FilterPlanNode);
+ 
+   /** 所有返回的元组必须满足的谓词 */
+   AbstractExpressionRef predicate_;
+ 
+  protected:
+   auto PlanNodeToString() const -> std::string override {
+     return fmt::format("Filter {{ predicate={} }}", *predicate_);
+   }
+ }; 
 
 }  // namespace bustub

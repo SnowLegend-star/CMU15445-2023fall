@@ -114,6 +114,7 @@ class AbstractPlanNode {
   virtual auto PlanNodeToString() const -> std::string { return "<unknown>"; }
 
   /** @return the string representation of the plan node's children */
+  /** 返回所有子节点的字符串表示 **/
   auto ChildrenToString(int indent, bool with_schema = true) const -> std::string;
 
  private:

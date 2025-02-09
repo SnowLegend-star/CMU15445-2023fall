@@ -24,7 +24,7 @@ namespace bustub {
 Tuple::Tuple(std::vector<Value> values, const Schema *schema) {
   assert(values.size() == schema->GetColumnCount());
 
-  // 1. Calculate the size of the tuple.
+  // 1. 计算元组的大小。
   uint32_t tuple_size = schema->GetLength();
   for (auto &i : schema->GetUnlinedColumns()) {
     auto len = values[i].GetLength();
@@ -34,20 +34,20 @@ Tuple::Tuple(std::vector<Value> values, const Schema *schema) {
     tuple_size += (len + sizeof(uint32_t));
   }
 
-  // 2. Allocate memory.
+  // 2. 分配内存。
   data_.resize(tuple_size);
   std::fill(data_.begin(), data_.end(), 0);
 
-  // 3. Serialize each attribute based on the input value.
+  // 3. 根据输入值序列化每个属性。
   uint32_t column_count = schema->GetColumnCount();
   uint32_t offset = schema->GetLength();
 
   for (uint32_t i = 0; i < column_count; i++) {
     const auto &col = schema->GetColumn(i);
     if (!col.IsInlined()) {
-      // Serialize relative offset, where the actual varchar data is stored.
+      // 序列化相对偏移量，实际的 varchar 数据存储在此位置。
       *reinterpret_cast<uint32_t *>(data_.data() + col.GetOffset()) = offset;
-      // Serialize varchar value, in place (size+data).
+      // 序列化 varchar 值，就地存储（大小+数据）。
       values[i].SerializeTo(data_.data() + offset);
       auto len = values[i].GetLength();
       if (len == BUSTUB_VALUE_NULL) {
@@ -64,11 +64,11 @@ auto Tuple::GetValue(const Schema *schema, const uint32_t column_idx) const -> V
   assert(schema);
   const TypeId column_type = schema->GetColumn(column_idx).GetType();
   const char *data_ptr = GetDataPtr(schema, column_idx);
-  // the third parameter "is_inlined" is unused
+  // 第三个参数 "is_inlined" 未使用
   return Value::DeserializeFrom(data_ptr, column_type);
 }
 
-// 生成一个key_schema类型的元组
+// 生成一个 key_schema 类型的元组
 auto Tuple::KeyFromTuple(const Schema &schema, const Schema &key_schema, const std::vector<uint32_t> &key_attrs)
     -> Tuple {
   std::vector<Value> values;
@@ -83,13 +83,13 @@ auto Tuple::GetDataPtr(const Schema *schema, const uint32_t column_idx) const ->
   assert(schema);
   const auto &col = schema->GetColumn(column_idx);
   bool is_inlined = col.IsInlined();
-  // For inline type, data is stored where it is.
+  // 对于内联类型，数据存储在其所在位置。
   if (is_inlined) {
     return (data_.data() + col.GetOffset());
   }
-  // We read the relative offset from the tuple data.
+  // 我们从元组数据中读取相对偏移量。
   int32_t offset = *reinterpret_cast<const int32_t *>(data_.data() + col.GetOffset());
-  // And return the beginning address of the real data for the VARCHAR type.
+  // 并返回实际数据的起始地址，对于 VARCHAR 类型。
   return (data_.data() + offset);
 }
 

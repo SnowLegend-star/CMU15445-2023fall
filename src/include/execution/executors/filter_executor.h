@@ -22,40 +22,39 @@
 #include "storage/table/tuple.h"
 
 namespace bustub {
-
 /**
- * The FilterExecutor executor executes a filter.
+ * FilterExecutor 执行一个过滤器。
  */
-class FilterExecutor : public AbstractExecutor {
- public:
-  /**
-   * Construct a new FilterExecutor instance.
-   * @param exec_ctx The executor context
-   * @param plan The filter plan to be executed
-   * @param child_executor The child executor that feeds the filter
-   */
-  FilterExecutor(ExecutorContext *exec_ctx, const FilterPlanNode *plan,
-                 std::unique_ptr<AbstractExecutor> &&child_executor);
-
-  /** Initialize the filter */
-  void Init() override;
-
-  /**
-   * Yield the next tuple from the filter.
-   * @param[out] tuple The next tuple produced by the filter
-   * @param[out] rid The next tuple RID produced by the filter
-   * @return `true` if a tuple was produced, `false` if there are no more tuples
-   */
-  auto Next(Tuple *tuple, RID *rid) -> bool override;
-
-  /** @return The output schema for the filter plan */
-  auto GetOutputSchema() const -> const Schema & override { return plan_->OutputSchema(); }
-
- private:
-  /** The filter plan node to be executed */
-  const FilterPlanNode *plan_;
-
-  /** The child executor from which tuples are obtained */
-  std::unique_ptr<AbstractExecutor> child_executor_;
-};
+ class FilterExecutor : public AbstractExecutor {
+  public:
+   /**
+    * 构造一个新的 FilterExecutor 实例。
+    * @param exec_ctx 执行上下文
+    * @param plan 要执行的过滤器计划
+    * @param child_executor 提供过滤器输入的子执行器
+    */
+   FilterExecutor(ExecutorContext *exec_ctx, const FilterPlanNode *plan,
+                  std::unique_ptr<AbstractExecutor> &&child_executor);
+ 
+   /** 初始化过滤器 */
+   void Init() override;
+ 
+   /**
+    * 输出过滤器的下一个元组。
+    * @param[out] tuple 过滤器生成的下一个元组
+    * @param[out] rid 过滤器生成的下一个元组的 RID
+    * @return 如果生成了元组，返回 `true`；如果没有更多元组，返回 `false`
+    */
+   auto Next(Tuple *tuple, RID *rid) -> bool override;
+ 
+   /** @return 过滤器计划的输出模式 */
+   auto GetOutputSchema() const -> const Schema & override { return plan_->OutputSchema(); }
+ 
+  private:
+   /** 要执行的过滤器计划节点 */
+   const FilterPlanNode *plan_;
+ 
+   /** 用于提供元组的子执行器 */
+   std::unique_ptr<AbstractExecutor> child_executor_;
+ }; 
 }  // namespace bustub
