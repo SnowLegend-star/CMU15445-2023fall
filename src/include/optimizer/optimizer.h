@@ -26,6 +26,7 @@ class Optimizer {
 
   auto OptimizeCustom(const AbstractPlanNodeRef &plan) -> AbstractPlanNodeRef;
 
+  void PredParser(const AbstractExpressionRef &predicate,std::vector<AbstractExpressionRef> *left_pred,std::vector<AbstractExpressionRef> *right_pred);
  private:
   /**
    * @brief 合并执行相同投影操作的投影节点。

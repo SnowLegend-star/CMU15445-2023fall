@@ -69,7 +69,7 @@ namespace bustub {
   //  std::vector<RID>::iterator left_table_iter_; // 左侧表的迭代器 naive方法中, 表是无序的, 用iter也没用
   Tuple left_cur_tuple_;  // 记录left table正在处理的元组
   bool left_status_;  // 此次获取left table的元素是否成功
-  // bool tuple_match_;   // 这次left tuple是否找到了对应的right tuple  left tuple必然会找到对应的
+  bool tuple_match_;   // 这次left tuple是否找到了对应的right tuple  left tuple必然会找到对应的
  }; 
 
 }  // namespace bustub

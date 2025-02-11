@@ -25,6 +25,7 @@ void SeqScanExecutor::Init() {
     table_heap_=table_info_->table_.get();
     auto iter=table_heap_->MakeIterator();
     // 开始遍历这个table_heap
+    rids_.clear();
     while(!iter.IsEnd()){
         rids_.push_back(iter.GetRID());
         ++iter;

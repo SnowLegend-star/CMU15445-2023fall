@@ -40,6 +40,7 @@ void AggregationExecutor::Init() {
     auto group_aggrs=plan_->aggregates_;
     auto aggrs_types=plan_->agg_types_;
     // 从child_exec获得元组, 并进行聚合
+    aht_.Clear();
     while(child_executor_->Next(&child_tuple, &child_rid)){
         auto aggr_key=MakeAggregateKey(&child_tuple);
         AggregateValue aggr_val=MakeAggregateValue(&child_tuple);
