@@ -44,7 +44,7 @@ class LogicExpression : public AbstractExpression {
       throw bustub::NotImplementedException("expect boolean from either side");
     }
   }
-  
+
   /** 这两子表达式都是bool类型**/
   auto Evaluate(const Tuple *tuple, const Schema &schema) const -> Value override {
     Value lhs = GetChildAt(0)->Evaluate(tuple, schema);

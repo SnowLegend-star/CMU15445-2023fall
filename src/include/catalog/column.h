@@ -140,7 +140,6 @@ class Column {
   uint32_t column_offset_{0};
 };
 
-
 }  // namespace bustub
 
 template <typename T>

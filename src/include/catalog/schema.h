@@ -113,7 +113,6 @@ class Schema {
   std::vector<uint32_t> uninlined_columns_;
 };
 
-
 }  // namespace bustub
 
 template <typename T>

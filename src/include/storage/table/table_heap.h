@@ -42,18 +42,18 @@ class TableHeap {
   ~TableHeap() = default;
 
   /**
-  * 在没有事务的情况下创建一个表堆。（打开表）
-  * @param buffer_pool_manager 缓冲池管理器
-  * @param first_page_id 表的第一页的 ID
-  */
+   * 在没有事务的情况下创建一个表堆。（打开表）
+   * @param buffer_pool_manager 缓冲池管理器
+   * @param first_page_id 表的第一页的 ID
+   */
   explicit TableHeap(BufferPoolManager *bpm);
 
   /**
-  * 将一个元组插入到表中。如果元组太大（>= 页面大小），则返回 std::nullopt。
-  * @param meta 元组的元数据
-  * @param tuple 要插入的元组
-  * @return 插入的元组的 RID
-  */
+   * 将一个元组插入到表中。如果元组太大（>= 页面大小），则返回 std::nullopt。
+   * @param meta 元组的元数据
+   * @param tuple 要插入的元组
+   * @return 插入的元组的 RID
+   */
   auto InsertTuple(const TupleMeta &meta, const Tuple &tuple, LockManager *lock_mgr = nullptr,
                    Transaction *txn = nullptr, table_oid_t oid = 0) -> std::optional<RID>;
 
@@ -72,18 +72,18 @@ class TableHeap {
   auto GetTuple(RID rid) -> std::pair<TupleMeta, Tuple>;
 
   /**
-  * 从表中读取一个元组的元数据。注意：如果你想同时获取元组和元数据，请使用 `GetTuple` 以确保原子性。
-  * @param rid 要读取的元组的 rid
-  * @return 元数据
-  */
+   * 从表中读取一个元组的元数据。注意：如果你想同时获取元组和元数据，请使用 `GetTuple` 以确保原子性。
+   * @param rid 要读取的元组的 rid
+   * @return 元数据
+   */
   auto GetTupleMeta(RID rid) -> TupleMeta;
 
-  /** 
-  * 返回该表的迭代器。当这个迭代器被创建时，它将记录表中当前的最后一个元组，迭代器将在该点停止，
-  * 以避免万圣节问题。通常你会在项目 3 中使用这个函数。如果你已经实现了项目 4 的更新执行器作为
-  * 管道中断，你可以使用 `MakeEagerIterator` 来测试更新执行器是否正确实现。
-  * 如果一切实现正确，这个函数和项目 4 中的 `MakeEagerIterator` 应该没有区别。
-  */
+  /**
+   * 返回该表的迭代器。当这个迭代器被创建时，它将记录表中当前的最后一个元组，迭代器将在该点停止，
+   * 以避免万圣节问题。通常你会在项目 3 中使用这个函数。如果你已经实现了项目 4 的更新执行器作为
+   * 管道中断，你可以使用 `MakeEagerIterator` 来测试更新执行器是否正确实现。
+   * 如果一切实现正确，这个函数和项目 4 中的 `MakeEagerIterator` 应该没有区别。
+   */
   auto MakeIterator() -> TableIterator;
 
   /** @return the iterator of this table. The iterator will stop at the last tuple at the time of iterating. */
@@ -93,13 +93,13 @@ class TableHeap {
   inline auto GetFirstPageId() const -> page_id_t { return first_page_id_; }
 
   /**
-  * 就地更新一个元组。这个函数不应在项目 3 中使用。请在项目 3 中将更新执行器实现为删除和插入。
-  * 你将在项目 4 中使用这个函数。
-  * @param meta 新的元组元数据
-  * @param tuple 新的元组
-  * @param rid 要更新的元组的 rid
-  * @param check 在实际更新之前要运行的检查
-  */
+   * 就地更新一个元组。这个函数不应在项目 3 中使用。请在项目 3 中将更新执行器实现为删除和插入。
+   * 你将在项目 4 中使用这个函数。
+   * @param meta 新的元组元数据
+   * @param tuple 新的元组
+   * @param rid 要更新的元组的 rid
+   * @param check 在实际更新之前要运行的检查
+   */
   auto UpdateTupleInPlace(const TupleMeta &meta, const Tuple &tuple, RID rid,
                           std::function<bool(const TupleMeta &meta, const Tuple &table, RID rid)> &&check = nullptr)
       -> bool;

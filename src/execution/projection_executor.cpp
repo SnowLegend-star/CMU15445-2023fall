@@ -9,7 +9,7 @@ ProjectionExecutor::ProjectionExecutor(ExecutorContext *exec_ctx, const Projecti
 
 void ProjectionExecutor::Init() {
   // Initialize the child executor
-  std::cout<<plan_->ToString()<<std::endl;
+  std::cout << plan_->ToString() << std::endl;
   // std::cout<<plan_->GetChildPlan()<<std::endl;
   child_executor_->Init();
 }

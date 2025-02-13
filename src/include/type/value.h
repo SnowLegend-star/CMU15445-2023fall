@@ -45,42 +45,42 @@ class Value {
  public:
   // 构造函数，使用 TypeId 类型来初始化值
   explicit Value(const TypeId type) : manage_data_(false), type_id_(type) { size_.len_ = BUSTUB_VALUE_NULL; }
-  
+
   // 布尔值和小整数（TINYINT）
   Value(TypeId type, int8_t i);
-  
+
   // 十进制（DECIMAL）
   Value(TypeId type, double d);
   Value(TypeId type, float f);
-  
+
   // 小整数（SMALLINT）
   Value(TypeId type, int16_t i);
-  
+
   // 整数（INTEGER）
   Value(TypeId type, int32_t i);
-  
+
   // 大整数（BIGINT）
   Value(TypeId type, int64_t i);
-  
+
   // 时间戳（TIMESTAMP）
   Value(TypeId type, uint64_t i);
-  
+
   // 可变长度字符串（VARCHAR）
   Value(TypeId type, const char *data, uint32_t len, bool manage_data);
   Value(TypeId type, const std::string &data);
 
   // 默认构造函数，初始化为无效类型
   Value() : Value(TypeId::INVALID) {}
-  
+
   // 拷贝构造函数
   Value(const Value &other);
-  
+
   // 拷贝赋值运算符
   auto operator=(Value other) -> Value &;
-  
+
   // 析构函数
   ~Value();
-  
+
   // 交换两个值
   // NOLINTNEXTLINE
   friend void Swap(Value &first, Value &second) {
@@ -89,10 +89,10 @@ class Value {
     std::swap(first.manage_data_, second.manage_data_);
     std::swap(first.type_id_, second.type_id_);
   }
-  
+
   // 检查值是否为整数
   auto CheckInteger() const -> bool;
-  
+
   // 检查该值是否可以与另一个值比较
   auto CheckComparable(const Value &o) const -> bool;
 
@@ -115,7 +115,7 @@ class Value {
   inline auto CastAs(const TypeId type_id) const -> Value {
     return Type::GetInstance(type_id_)->CastAs(*this, type_id);
   }
-  
+
   // 如果两个值相等，返回 true
   inline auto CompareExactlyEquals(const Value &o) const -> bool {
     if (this->IsNull() && o.IsNull()) {
@@ -156,10 +156,10 @@ class Value {
 
   // 操作空值
   inline auto OperateNull(const Value &o) const -> Value { return Type::GetInstance(type_id_)->OperateNull(*this, o); }
-  
+
   // 检查是否为零
   inline auto IsZero() const -> bool { return Type::GetInstance(type_id_)->IsZero(*this); }
-  
+
   // 检查是否为空值
   inline auto IsNull() const -> bool { return size_.len_ == BUSTUB_VALUE_NULL; }
 
@@ -182,24 +182,24 @@ class Value {
  protected:
   // 实际的值项
   union Val {
-    int8_t boolean_;      // 布尔值
-    int8_t tinyint_;      // 小整数
-    int16_t smallint_;    // 小整数
-    int32_t integer_;     // 整数
-    int64_t bigint_;      // 大整数
-    double decimal_;      // 十进制数
-    uint64_t timestamp_;  // 时间戳
-    char *varlen_;        // 可变长度字符串
+    int8_t boolean_;            // 布尔值
+    int8_t tinyint_;            // 小整数
+    int16_t smallint_;          // 小整数
+    int32_t integer_;           // 整数
+    int64_t bigint_;            // 大整数
+    double decimal_;            // 十进制数
+    uint64_t timestamp_;        // 时间戳
+    char *varlen_;              // 可变长度字符串
     const char *const_varlen_;  // 常量可变长度字符串
   } value_;
 
   union {
-    uint32_t len_;           // 长度
-    TypeId elem_type_id_;    // 元素类型
+    uint32_t len_;         // 长度
+    TypeId elem_type_id_;  // 元素类型
   } size_;
 
-  bool manage_data_;   // 是否管理数据
-  TypeId type_id_;     // 数据类型
+  bool manage_data_;  // 是否管理数据
+  TypeId type_id_;    // 数据类型
 };
 }  // namespace bustub
 

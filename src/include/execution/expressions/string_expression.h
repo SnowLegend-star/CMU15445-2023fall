@@ -38,7 +38,7 @@ enum class StringExpressionType { Lower, Upper };
  */
 class StringExpression : public AbstractExpression {
  public:
- /** 接收一个VARCHAR类型的表达式 **/
+  /** 接收一个VARCHAR类型的表达式 **/
   StringExpression(AbstractExpressionRef arg, StringExpressionType expr_type)
       : AbstractExpression({std::move(arg)}, TypeId::VARCHAR), expr_type_{expr_type} {
     if (GetChildAt(0)->GetReturnType() != TypeId::VARCHAR) {

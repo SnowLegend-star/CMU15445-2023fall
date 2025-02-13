@@ -54,5 +54,6 @@ class LimitExecutor : public AbstractExecutor {
 
   /** The child executor from which tuples are obtained */
   std::unique_ptr<AbstractExecutor> child_executor_;
+  std::size_t output_cnt_;  // 已经输出的tuple数量
 };
 }  // namespace bustub

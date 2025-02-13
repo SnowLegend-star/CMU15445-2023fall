@@ -57,7 +57,7 @@ class AbstractExpression {
   virtual auto Evaluate(const Tuple *tuple, const Schema &schema) const -> Value = 0;
 
   /**
-   * 返回通过评估 JOIN 操作得到的值。 跨表比较  返回value本质是bool类型 
+   * 返回通过评估 JOIN 操作得到的值。 跨表比较  返回value本质是bool类型
    * @param left_tuple 左边的元组
    * @param left_schema 左边元组的模式
    * @param right_tuple 右边的元组

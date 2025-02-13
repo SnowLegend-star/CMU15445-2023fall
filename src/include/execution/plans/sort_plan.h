@@ -54,6 +54,7 @@ class SortPlanNode : public AbstractPlanNode {
 
   BUSTUB_PLAN_NODE_CLONE_WITH_CHILDREN(SortPlanNode);
 
+  // ExternalMergeSort { order_bys=[("Ascending", "#0.0"), ("Descending", "#0.1")] }类似这种
   std::vector<std::pair<OrderByType, AbstractExpressionRef>> order_bys_;
 
  protected:

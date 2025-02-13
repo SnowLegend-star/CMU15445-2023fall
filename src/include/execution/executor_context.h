@@ -49,7 +49,7 @@ class ExecutorContext {
         is_delete_(is_delete) {
     nlj_check_exec_set_ = std::deque<std::pair<AbstractExecutor *, AbstractExecutor *>>(
         std::deque<std::pair<AbstractExecutor *, AbstractExecutor *>>{});  // 初始化 NLJ 检查执行器集合
-    check_options_ = std::make_shared<CheckOptions>();  // 初始化检查选项
+    check_options_ = std::make_shared<CheckOptions>();                     // 初始化检查选项
   }
 
   ~ExecutorContext() = default;

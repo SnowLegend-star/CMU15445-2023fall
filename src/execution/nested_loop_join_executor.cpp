@@ -43,8 +43,8 @@ void NestedLoopJoinExecutor::Init() {
   right_executor_->Init();
   std::cout << plan_->ToString() << std::endl;
   RID tmp_rid;
-  left_status_=left_executor_->Next(&left_cur_tuple_, &tmp_rid);
-  tuple_match_=false;
+  left_status_ = left_executor_->Next(&left_cur_tuple_, &tmp_rid);
+  tuple_match_ = false;
 }
 
 auto NestedLoopJoinExecutor::InnerJoin() -> bool { return true; }
@@ -72,11 +72,11 @@ auto NestedLoopJoinExecutor::Next(Tuple *tuple, RID *rid) -> bool {
       if (!right_status) {  //已经找完right table的元素了
         // 对应left join, 开始添加null。对于inner, 则直接进入下一次循环
         // 如果这个left tuple在当前轮次已经找到过对应的right tuple就跳过这一步
-        if (plan_->join_type_ == JoinType::LEFT&&!tuple_match_) {
+        if (plan_->join_type_ == JoinType::LEFT && !tuple_match_) {
           std::vector<Value> result;
           Value cur_val;  // 当前列的value值
           // 提取左表所有的列元素
-          for (uint32_t i = 0; i < left_schema.GetColumnCount(); i++) { 
+          for (uint32_t i = 0; i < left_schema.GetColumnCount(); i++) {
             cur_val = left_cur_tuple_.GetValue(&left_schema, i);
             result.emplace_back(cur_val);
           }
@@ -88,12 +88,12 @@ auto NestedLoopJoinExecutor::Next(Tuple *tuple, RID *rid) -> bool {
           *tuple = Tuple{result, &plan_->OutputSchema()};
           // tuple_match_=true;  // 这个left tuple遍历到right table的末尾了, 不算找到
           right_executor_->Init();
-          left_status_=left_executor_->Next(&left_cur_tuple_, &left_rid);
+          left_status_ = left_executor_->Next(&left_cur_tuple_, &left_rid);
           return true;
         }
         right_executor_->Init();
-        left_status_=left_executor_->Next(&left_cur_tuple_, &left_rid);
-        tuple_match_=false;
+        left_status_ = left_executor_->Next(&left_cur_tuple_, &left_rid);
+        tuple_match_ = false;
         break;
       }
       // 判断两个tuple是否符合pred  value的类型为bool
@@ -112,7 +112,7 @@ auto NestedLoopJoinExecutor::Next(Tuple *tuple, RID *rid) -> bool {
           result.emplace_back(cur_val);
         }
         *tuple = Tuple{result, &plan_->OutputSchema()};
-        tuple_match_=true;  // 这个left tuple已经找到对应的right tuple了
+        tuple_match_ = true;  // 这个left tuple已经找到对应的right tuple了
         return true;
       }
     }

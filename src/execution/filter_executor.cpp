@@ -11,7 +11,7 @@ FilterExecutor::FilterExecutor(ExecutorContext *exec_ctx, const FilterPlanNode *
 void FilterExecutor::Init() {
   // Initialize the child executor
   child_executor_->Init();
-  std::cout<<plan_->ToString()<<std::endl;
+  std::cout << plan_->ToString() << std::endl;
 }
 
 auto FilterExecutor::Next(Tuple *tuple, RID *rid) -> bool {

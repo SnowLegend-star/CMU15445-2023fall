@@ -60,6 +60,6 @@ class DeleteExecutor : public AbstractExecutor {
 
   /** 从中获取删除元组 RID 的子执行器 */
   std::unique_ptr<AbstractExecutor> child_executor_;
-  bool delete_finish_; //手动设置只执行一次的flag
+  bool delete_finish_;  //手动设置只执行一次的flag
 };
 }  // namespace bustub

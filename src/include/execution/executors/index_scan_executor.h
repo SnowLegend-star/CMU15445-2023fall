@@ -46,6 +46,5 @@ class IndexScanExecutor : public AbstractExecutor {
   const IndexScanPlanNode *plan_;
   std::vector<RID> rids_;
   bool index_scan_finish_;  // 手动设置只执行一次的flag
-  
 };
 }  // namespace bustub

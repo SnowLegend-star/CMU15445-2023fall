@@ -74,38 +74,38 @@ class SimpleAggregationHashTable {
    */
   void CombineAggregateValues(AggregateValue *result, const AggregateValue &input) {
     for (uint32_t i = 0; i < agg_exprs_.size(); i++) {
-      Value old_value=result->aggregates_[i];
+      Value old_value = result->aggregates_[i];
       switch (agg_types_[i]) {
         case AggregationType::CountStarAggregate:
-          result->aggregates_[i]=result->aggregates_[i].Add(ValueFactory::GetIntegerValue(1));
+          result->aggregates_[i] = result->aggregates_[i].Add(ValueFactory::GetIntegerValue(1));
           break;
         case AggregationType::CountAggregate:
-          if(old_value.IsNull()){
-            result->aggregates_[i]=Value{TypeId::INTEGER,0};
+          if (old_value.IsNull()) {
+            result->aggregates_[i] = Value{TypeId::INTEGER, 0};
           }
-          if(!input.aggregates_[i].IsNull()){
-            result->aggregates_[i]=result->aggregates_[i].Add(ValueFactory::GetIntegerValue(1));            
+          if (!input.aggregates_[i].IsNull()) {
+            result->aggregates_[i] = result->aggregates_[i].Add(ValueFactory::GetIntegerValue(1));
           }
           break;
         case AggregationType::SumAggregate:
-          if(old_value.IsNull()){
+          if (old_value.IsNull()) {
             result->aggregates_[i] = input.aggregates_[i];
-          }else if(!input.aggregates_[i].IsNull()){
-            result->aggregates_[i]=result->aggregates_[i].Add(input.aggregates_[i]);
+          } else if (!input.aggregates_[i].IsNull()) {
+            result->aggregates_[i] = result->aggregates_[i].Add(input.aggregates_[i]);
           }
           break;
         case AggregationType::MinAggregate:
-          if(old_value.IsNull()){
+          if (old_value.IsNull()) {
             result->aggregates_[i] = input.aggregates_[i];
-          }else if(!input.aggregates_[i].IsNull()){
-            result->aggregates_[i]=old_value.Min(input.aggregates_[i]);
+          } else if (!input.aggregates_[i].IsNull()) {
+            result->aggregates_[i] = old_value.Min(input.aggregates_[i]);
           }
           break;
         case AggregationType::MaxAggregate:
-          if(old_value.IsNull()){
+          if (old_value.IsNull()) {
             result->aggregates_[i] = input.aggregates_[i];
-          }else if(!input.aggregates_[i].IsNull()){
-            result->aggregates_[i]=old_value.Max(input.aggregates_[i]);
+          } else if (!input.aggregates_[i].IsNull()) {
+            result->aggregates_[i] = old_value.Max(input.aggregates_[i]);
           }
           break;
       }
@@ -123,7 +123,7 @@ class SimpleAggregationHashTable {
     }
     CombineAggregateValues(&ht_[agg_key], agg_val);
   }
-void InsertEmptyCombine() { ht_.insert({{std::vector<Value>()}, GenerateInitialAggregateValue()}); }
+  void InsertEmptyCombine() { ht_.insert({{std::vector<Value>()}, GenerateInitialAggregateValue()}); }
   /**
    * 清空哈希表
    */
@@ -164,6 +164,9 @@ void InsertEmptyCombine() { ht_.insert({{std::vector<Value>()}, GenerateInitialA
   /** @return 哈希表的结束迭代器 */
   auto End() -> Iterator { return Iterator{ht_.cend()}; }
 
+  /** 获得哈希表当前的大小**/
+  auto Size() -> size_t { return ht_.size(); }
+  
  private:
   /** 哈希表是一个从聚合键到聚合值的映射 */
   std::unordered_map<AggregateKey, AggregateValue> ht_{};
@@ -233,13 +236,11 @@ class AggregationExecutor : public AbstractExecutor {
   std::unique_ptr<AbstractExecutor> child_executor_;
 
   /** 简单聚合哈希表 */
-  // TODO(学生): 取消注释 
+  // TODO(学生): 取消注释
   SimpleAggregationHashTable aht_;
 
   /** 简单聚合哈希表迭代器 */
-  // TODO(学生): 取消注释 
+  // TODO(学生): 取消注释
   SimpleAggregationHashTable::Iterator aht_iterator_;
-
-  
 };
 }  // namespace bustub

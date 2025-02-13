@@ -50,7 +50,7 @@ class ColumnValueExpression : public AbstractExpression {
   auto GetColIdx() const -> uint32_t { return col_idx_; }
 
   /** @return the string representation of the plan node and its children */
-  // "#1.3" 代表 右表（1）中的第 3 列。 
+  // "#1.3" 代表 右表（1）中的第 3 列。
   // 终于找到这句话的跟脚了
   auto ToString() const -> std::string override { return fmt::format("#{}.{}", tuple_idx_, col_idx_); }
 

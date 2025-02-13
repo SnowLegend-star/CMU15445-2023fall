@@ -51,16 +51,16 @@ struct TableInfo {
    */
   TableInfo(Schema schema, std::string name, std::unique_ptr<TableHeap> &&table, table_oid_t oid)
       : schema_{std::move(schema)}, name_{std::move(name)}, table_{std::move(table)}, oid_{oid} {}
-  
+
   /** 表的模式 */
   Schema schema_;
-  
+
   /** 表的名称 */
   const std::string name_;
-  
+
   /** 表堆的拥有指针 */
   std::unique_ptr<TableHeap> table_;
-  
+
   /** 表的 OID */
   const table_oid_t oid_;
 };
@@ -90,29 +90,28 @@ struct IndexInfo {
 
   /** 索引键的模式 */
   Schema key_schema_;
-  
+
   /** 索引的名称 */
   std::string name_;
-  
+
   /** 索引的拥有指针 */
   std::unique_ptr<Index> index_;
-  
+
   /** 索引的唯一 OID */
   index_oid_t index_oid_;
-  
+
   /** 创建索引的表名 */
   std::string table_name_;
-  
+
   /** 索引键的大小，单位为字节 */
   const size_t key_size_;
-  
+
   /** 是否为主键索引 */
   bool is_primary_key_;
-  
+
   /** 索引类型 */
   [[maybe_unused]] IndexType index_type_{IndexType::BPlusTreeIndex};
 };
-
 
 /**
  * Catalog 是一个非持久化的目录，专为 DBMS 执行引擎中的执行器使用。
@@ -152,8 +151,8 @@ class Catalog {
     // 构造表堆
     std::unique_ptr<TableHeap> table = nullptr;
 
-    // 当 create_table_heap == false 时，意味着我们正在运行绑定器测试（此时不会提供事务），或者我们在没有缓冲池的 shell 中运行。
-    // 在这种情况下不需要创建 TableHeap。
+    // 当 create_table_heap == false 时，意味着我们正在运行绑定器测试（此时不会提供事务），或者我们在没有缓冲池的 shell
+    // 中运行。 在这种情况下不需要创建 TableHeap。
     if (create_table_heap) {
       table = std::make_unique<TableHeap>(bpm_);
     } else {
@@ -250,12 +249,12 @@ class Catalog {
     // TODO(chi): 支持哈希索引和 B 树索引
     std::unique_ptr<Index> index;
     if (index_type == IndexType::HashTableIndex) {
-      std::cout<<"创建的索引类型是: HashTableIndex"<<std::endl;
+      std::cout << "创建的索引类型是: HashTableIndex" << std::endl;
       index = std::make_unique<ExtendibleHashTableIndex<KeyType, ValueType, KeyComparator>>(std::move(meta), bpm_,
                                                                                             hash_function);
     } else {
       BUSTUB_ASSERT(index_type == IndexType::BPlusTreeIndex, "Unsupported Index Type");
-      std::cout<<"创建的索引类型是: BPlusTreeIndex"<<std::endl;
+      std::cout << "创建的索引类型是: BPlusTreeIndex" << std::endl;
       index = std::make_unique<BPlusTreeIndex<KeyType, ValueType, KeyComparator>>(std::move(meta), bpm_);
     }
 
@@ -386,7 +385,7 @@ class Catalog {
 
   /** 表名 -> 表标识符的映射。 */
   std::unordered_map<std::string, table_oid_t> table_names_;
-  
+
   /** 下一个要使用的表标识符。 */
   std::atomic<table_oid_t> next_table_oid_{0};
 

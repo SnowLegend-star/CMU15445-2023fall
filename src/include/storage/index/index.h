@@ -80,7 +80,7 @@ class IndexMetadata {
   auto ToString() const -> std::string {
     std::stringstream os;
 
-    os << "IndexMetadata[" 
+    os << "IndexMetadata["
        << "Name = " << name_ << ", "
        << "Type = B+Tree, "
        << "Table name = " << table_name_ << "] :: ";

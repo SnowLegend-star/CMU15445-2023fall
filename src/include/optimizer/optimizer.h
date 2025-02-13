@@ -26,17 +26,21 @@ class Optimizer {
 
   auto OptimizeCustom(const AbstractPlanNodeRef &plan) -> AbstractPlanNodeRef;
 
-  void PredParser(const AbstractExpressionRef &predicate,std::vector<AbstractExpressionRef> *left_pred,std::vector<AbstractExpressionRef> *right_pred);
+  void PredParser(const AbstractExpressionRef &predicate, std::vector<AbstractExpressionRef> *left_pred,
+                  std::vector<AbstractExpressionRef> *right_pred);
+
  private:
   /**
    * @brief 合并执行相同投影操作的投影节点。
-   * 相同的投影操作可能会在存在 `SELECT *`、聚合操作，或需要重命名列时在规划器中产生。我们将合并这些投影操作，以提高执行效率。
+   * 相同的投影操作可能会在存在 `SELECT
+   * *`、聚合操作，或需要重命名列时在规划器中产生。我们将合并这些投影操作，以提高执行效率。
    */
   auto OptimizeMergeProjection(const AbstractPlanNodeRef &plan) -> AbstractPlanNodeRef;
 
   /**
    * @brief 将过滤条件合并到嵌套循环连接中。
-   * 在规划器中，我们通常将笛卡尔积（cross join）和过滤条件计划成两个节点（分别为 `cross product` 和 `filter plan node`）。我们可以将过滤条件合并到嵌套循环连接中，以提高效率。
+   * 在规划器中，我们通常将笛卡尔积（cross join）和过滤条件计划成两个节点（分别为 `cross product` 和 `filter plan
+   * node`）。我们可以将过滤条件合并到嵌套循环连接中，以提高效率。
    */
   auto OptimizeMergeFilterNLJ(const AbstractPlanNodeRef &plan) -> AbstractPlanNodeRef;
 
@@ -105,7 +109,7 @@ class Optimizer {
    */
   auto EstimatedCardinality(const std::string &table_name) -> std::optional<size_t>;
 
-  /** 
+  /**
    * Catalog 会在规划过程中使用。用户应该确保它的生命周期长于优化器，否则会造成悬挂引用。
    */
   const Catalog &catalog_;
