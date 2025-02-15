@@ -63,8 +63,8 @@ class WindowFunctionPlanNode : public AbstractPlanNode {
    *    window_func_types: std::vector<WindowFunctionType>{SumAggregate, SumAggregate}
 
    * 这次所有的window_func都处理相同的order by
-   * 这个傻逼functions到底是啥呢？难道特指一个列吗？
-   * 那这个傻逼window_func_indexes又是什么√⑧？我去你的 要是没有建立索引就不用玩儿了是吧
+   * 
+   * 
    * damn! 这里window_func_indexes指的是window_func的个数, 而不是索引的意思。我才是傻逼
    */
   WindowFunctionPlanNode(SchemaRef output_schema, AbstractPlanNodeRef child, std::vector<uint32_t> window_func_indexes,

@@ -166,7 +166,7 @@ class SimpleAggregationHashTable {
 
   /** 获得哈希表当前的大小**/
   auto Size() -> size_t { return ht_.size(); }
-  
+
  private:
   /** 哈希表是一个从聚合键到聚合值的映射 */
   std::unordered_map<AggregateKey, AggregateValue> ht_{};

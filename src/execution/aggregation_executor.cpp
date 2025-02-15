@@ -49,7 +49,9 @@ void AggregationExecutor::Init() {
     aht_.InsertCombine(aggr_key, aggr_val);
   }  // 现在所有的元组都已经在aht_内了
 
-  if (aht_.Size() == 0 && GetOutputSchema().GetColumnCount() == 1) {// 空的哈希表也要初始化一遍
+  aht_iterator_ = aht_.Begin();
+  // 如果table是空的, 且聚合函数只有count(*)才需要这么写
+  if (aht_iterator_ == aht_.End() && plan_->output_schema_->GetColumnCount() == 1) {  // 空的哈希表也要初始化一遍
     aht_.InsertEmptyCombine();
   }
   aht_iterator_ = aht_.Begin();  // 必须重新初始化一遍
