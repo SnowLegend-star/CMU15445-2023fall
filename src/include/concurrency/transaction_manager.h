@@ -30,12 +30,11 @@
 
 namespace bustub {
 
-/// The first undo link in the version chain, that links table heap tuple to the undo log.
+/// 版本链中的第一个回滚链接，将表堆元组与回滚日志连接起来。
 struct VersionUndoLink {
-  /** The next version in the version chain. */
+  /** 版本链中的下一个版本。 */
   UndoLink prev_;
-  /** Whether a transaction is modifying the version link. Fall 2023: you do not need to read / write this field until
-   * task 4.2. */
+  /** 事务是否正在修改版本链接。2023年秋季：在任务4.2之前，你不需要读取/写入此字段。 */
   bool in_progress_{false};
 
   friend auto operator==(const VersionUndoLink &a, const VersionUndoLink &b) {
@@ -53,7 +52,7 @@ struct VersionUndoLink {
 };
 
 /**
- * TransactionManager keeps track of all the transactions running in the system.
+ * TransactionManager 跟踪系统中所有运行的事务。
  */
 class TransactionManager {
  public:
@@ -61,97 +60,88 @@ class TransactionManager {
   ~TransactionManager() = default;
 
   /**
-   * Begins a new transaction.
-   * @param isolation_level an optional isolation level of the transaction.
-   * @return an initialized transaction
+   * 开始一个新事务。
+   * @param isolation_level 事务的可选隔离级别。
+   * @return 初始化的事务
    */
   auto Begin(IsolationLevel isolation_level = IsolationLevel::SNAPSHOT_ISOLATION) -> Transaction *;
 
   /**
-   * Commits a transaction.
-   * @param txn the transaction to commit, the txn will be managed by the txn manager so no need to delete it by
-   * yourself
+   * 提交一个事务。
+   * @param txn 要提交的事务，事务会由事务管理器管理，因此不需要手动删除它
    */
   auto Commit(Transaction *txn) -> bool;
 
   /**
-   * Aborts a transaction
-   * @param txn the transaction to abort, the txn will be managed by the txn manager so no need to delete it by yourself
+   * 中止一个事务
+   * @param txn 要中止的事务，事务会由事务管理器管理，因此不需要手动删除它
    */
   void Abort(Transaction *txn);
 
   /**
-   * @brief Use this function before task 4.2. Update an undo link that links table heap tuple to the first undo log.
-   * Before updating, `check` function will be called to ensure validity.
+   * @brief 在任务4.2之前使用此函数。更新将表堆元组与第一个回滚日志连接的回滚链接。
+   * 在更新之前，将调用`check`函数以确保有效性。
    */
   auto UpdateUndoLink(RID rid, std::optional<UndoLink> prev_link,
                       std::function<bool(std::optional<UndoLink>)> &&check = nullptr) -> bool;
 
   /**
-   * @brief Use this function after task 4.2. Update an undo link that links table heap tuple to the first undo log.
-   * Before updating, `check` function will be called to ensure validity.
+   * @brief 在任务4.2之后使用此函数。更新将表堆元组与第一个回滚日志连接的版本链接。
+   * 在更新之前，将调用`check`函数以确保有效性。
    */
   auto UpdateVersionLink(RID rid, std::optional<VersionUndoLink> prev_version,
                          std::function<bool(std::optional<VersionUndoLink>)> &&check = nullptr) -> bool;
 
-  /** @brief Get the first undo log of a table heap tuple. Use this before task 4.2 */
+  /** @brief 获取表堆元组的第一个回滚日志。任务4.2之前使用 */
   auto GetUndoLink(RID rid) -> std::optional<UndoLink>;
 
-  /** @brief Get the first undo log of a table heap tuple. Use this after task 4.2 */
+  /** @brief 获取表堆元组的第一个回滚日志。任务4.2之后使用 */
   auto GetVersionLink(RID rid) -> std::optional<VersionUndoLink>;
 
-  /** @brief Access the transaction undo log buffer and get the undo log. Return nullopt if the txn does not exist. Will
-   * still throw an exception if the index is out of range. */
+  /** @brief 访问事务回滚日志缓冲区并获取回滚日志。如果事务不存在，返回nullopt。如果索引超出范围，仍会抛出异常。 */
   auto GetUndoLogOptional(UndoLink link) -> std::optional<UndoLog>;
 
-  /** @brief Access the transaction undo log buffer and get the undo log. Except when accessing the current txn buffer,
-   * you should always call this function to get the undo log instead of manually retrieve the txn shared_ptr and access
-   * the buffer. */
+  /** @brief 访问事务回滚日志缓冲区并获取回滚日志。除非访问当前事务缓冲区，否则你应该总是调用此函数来获取回滚日志，而不是手动获取事务共享指针并访问缓冲区。 */
   auto GetUndoLog(UndoLink link) -> UndoLog;
 
-  /** @brief Get the lowest read timestamp in the system. */
+  /** @brief 获取系统中最低的读取时间戳。 */
   auto GetWatermark() -> timestamp_t { return running_txns_.GetWatermark(); }
 
-  /** @brief Stop-the-world garbage collection. Will be called only when all transactions are not accessing the table
-   * heap. */
+  /** @brief 停止世界垃圾回收。当所有事务不再访问表堆时，会调用此函数。 */
   void GarbageCollection();
 
-  /** protects txn map */
+  /** 保护事务映射 */
   std::shared_mutex txn_map_mutex_;
-  /** All transactions, running or committed */
+  /** 所有事务，无论是正在运行还是已提交 */
   std::unordered_map<txn_id_t, std::shared_ptr<Transaction>> txn_map_;
 
   struct PageVersionInfo {
-    /** protects the map */
+    /** 保护映射 */
     std::shared_mutex mutex_;
-    /** Stores previous version info for all slots. Note: DO NOT use `[x]` to access it because
-     * it will create new elements even if it does not exist. Use `find` instead.
-     */
+    /** 存储所有槽的上一个版本信息。注意：不要使用`[x]`来访问，因为这样会创建新的元素，即使它不存在。应该使用`find`来访问。 */
     std::unordered_map<slot_offset_t, VersionUndoLink> prev_version_;
   };
 
-  /** protects version info */
+  /** 保护版本信息 */
   std::shared_mutex version_info_mutex_;
-  /** Stores the previous version of each tuple in the table heap. Do not directly access this field. Use the helper
-   * functions in `transaction_manager_impl.cpp`. */
+  /** 存储表堆中每个元组的前一个版本。不要直接访问此字段。使用`transaction_manager_impl.cpp`中的辅助函数。 */
   std::unordered_map<page_id_t, std::shared_ptr<PageVersionInfo>> version_info_;
 
-  /** Stores all the read_ts of running txns so as to facilitate garbage collection. */
+  /** 存储所有正在运行的事务的读时间戳，以便促进垃圾回收。 */
   Watermark running_txns_{0};
 
-  /** Only one txn is allowed to commit at a time */
+  /** 只允许一个事务在同一时间提交 */
   std::mutex commit_mutex_;
-  /** The last committed timestamp. */
+  /** 最后提交的时间戳。 */
   std::atomic<timestamp_t> last_commit_ts_{0};
 
-  /** Catalog */
+  /** 目录 */
   Catalog *catalog_;
 
   std::atomic<txn_id_t> next_txn_id_{TXN_START_ID};
 
  private:
-  /** @brief Verify if a txn satisfies serializability. We will not test this function and you can change / remove it as
-   * you want. */
+  /** @brief 验证事务是否满足可串行化。我们不会测试此函数，你可以根据需要更改或删除它。 */
   auto VerifyTxn(Transaction *txn) -> bool;
 };
 

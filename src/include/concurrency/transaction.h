@@ -39,13 +39,13 @@ namespace bustub {
 class TransactionManager;
 
 /**
- * Transaction State.
- */
+  * 事务状态。
+  */
 enum class TransactionState { RUNNING = 0, TAINTED, COMMITTED = 100, ABORTED };
 
 /**
- * Transaction isolation level. READ_UNCOMMITTED will NOT be used in project 3/4 as of Fall 2023.
- */
+  * 事务隔离级别。READ_UNCOMMITTED 在2023年秋季的项目3/4中将不使用。
+  */
 enum class IsolationLevel { READ_UNCOMMITTED, SNAPSHOT_ISOLATION, SERIALIZABLE };
 
 class TableHeap;
@@ -53,11 +53,11 @@ class Catalog;
 using table_oid_t = uint32_t;
 using index_oid_t = uint32_t;
 
-/** Represents a link to a previous version of this tuple */
+/** 表示指向此元组的前一个版本的链接 */
 struct UndoLink {
-  /* Previous version can be found in which txn */
+  /* 前一个版本所在的事务 */
   txn_id_t prev_txn_{INVALID_TXN_ID};
-  /* The log index of the previous version in `prev_txn_` */
+  /* 前一个版本在`prev_txn_`中的日志索引 */
   int prev_log_idx_{0};
 
   friend auto operator==(const UndoLink &a, const UndoLink &b) {
@@ -66,28 +66,28 @@ struct UndoLink {
 
   friend auto operator!=(const UndoLink &a, const UndoLink &b) { return !(a == b); }
 
-  /* Checks if the undo link points to something. */
+  /* 检查回滚链接是否有效 */
   auto IsValid() const -> bool { return prev_txn_ != INVALID_TXN_ID; }
 };
 
 struct UndoLog {
-  /* Whether this log is a deletion marker */
+  /* 此日志是否为删除标记 */
   bool is_deleted_;
-  /* The fields modified by this undo log */
+  /* 被此回滚日志修改的字段 */
   std::vector<bool> modified_fields_;
-  /* The modified fields */
+  /* 被修改的字段 */
   Tuple tuple_;
-  /* Timestamp of this undo log */
+  /* 此回滚日志的时间戳 */
   timestamp_t ts_{INVALID_TS};
-  /* Undo log prev version */
+  /* 回滚日志的前一个版本 */
   UndoLink prev_version_{};
 };
 
 /**
- * Transaction tracks information related to a transaction.
- */
+  * 事务类，跟踪与事务相关的信息。
+  */
 class Transaction {
- public:
+  public:
   explicit Transaction(txn_id_t txn_id, IsolationLevel isolation_level = IsolationLevel::SNAPSHOT_ISOLATION)
       : isolation_level_(isolation_level), thread_id_(std::this_thread::get_id()), txn_id_(txn_id) {}
 
@@ -95,37 +95,37 @@ class Transaction {
 
   DISALLOW_COPY(Transaction);
 
-  /** @return the id of the thread running the transaction */
+  /** @return 正在执行此事务的线程的ID */
   inline auto GetThreadId() const -> std::thread::id { return thread_id_; }
 
-  /** @return the id of this transaction */
+  /** @return 此事务的ID */
   inline auto GetTransactionId() const -> txn_id_t { return txn_id_; }
 
-  /** @return the id of this transaction, stripping the highest bit. NEVER use/store this value unless for debugging. */
+  /** @return 此事务的ID，去掉最高位。除非用于调试，否则永远不要使用/存储此值。 */
   inline auto GetTransactionIdHumanReadable() const -> txn_id_t { return txn_id_ ^ TXN_START_ID; }
 
-  /** @return the temporary timestamp of this transaction */
+  /** @return 此事务的临时时间戳 */
   inline auto GetTransactionTempTs() const -> timestamp_t { return txn_id_; }
 
-  /** @return the isolation level of this transaction */
+  /** @return 此事务的隔离级别 */
   inline auto GetIsolationLevel() const -> IsolationLevel { return isolation_level_; }
 
-  /** @return the transaction state */
+  /** @return 此事务的状态 */
   inline auto GetTransactionState() const -> TransactionState { return state_; }
 
-  /** @return the read ts */
+  /** @return 此事务的读取时间戳 */
   inline auto GetReadTs() const -> timestamp_t { return read_ts_; }
 
-  /** @return the commit ts */
+  /** @return 此事务的提交时间戳 */
   inline auto GetCommitTs() const -> timestamp_t { return commit_ts_; }
 
-  /** Modify an existing undo log. */
+  /** 修改现有的回滚日志 */
   inline auto ModifyUndoLog(int log_idx, UndoLog new_log) {
     std::scoped_lock<std::mutex> lck(latch_);
     undo_logs_[log_idx] = std::move(new_log);
   }
 
-  /** @return the index of the undo log in this transaction */
+  /** @return 在此事务中的回滚日志索引 */
   inline auto AppendUndoLog(UndoLog log) -> UndoLink {
     std::scoped_lock<std::mutex> lck(latch_);
     undo_logs_.emplace_back(std::move(log));
@@ -158,8 +158,7 @@ class Transaction {
     return undo_logs_.size();
   }
 
-  /** Use this function in leaderboard benchmarks for online garbage collection. For stop-the-world GC, simply remove
-   * the txn from the txn_map. */
+  /** 在排行榜基准测试中为在线垃圾回收使用此函数。对于停止世界垃圾回收，只需从txn_map中移除事务。 */
   inline auto ClearUndoLog() -> size_t {
     std::scoped_lock<std::mutex> lck(latch_);
     return undo_logs_.size();
@@ -167,43 +166,43 @@ class Transaction {
 
   void SetTainted();
 
- private:
+  private:
   friend class TransactionManager;
 
-  // The below fields should be ONLY changed by txn manager (with the txn manager lock held).
+  // 以下字段应仅由事务管理器（持有事务管理器锁）更改。
 
-  /** The state of this transaction. */
+  /** 此事务的状态 */
   std::atomic<TransactionState> state_{TransactionState::RUNNING};
 
-  /** The read ts */
+  /** 读取时间戳 */
   std::atomic<timestamp_t> read_ts_{0};
 
-  /** The commit ts */
+  /** 提交时间戳 */
   std::atomic<timestamp_t> commit_ts_{INVALID_TS};
 
-  /** The latch for this transaction for accessing txn-level undo logs, protecting all fields below. */
+  /** 该事务的锁，用于访问事务级回滚日志，保护以下所有字段。 */
   std::mutex latch_;
 
   /**
-   * @brief Store undo logs. Other undo logs / table heap will store (txn_id, index) pairs, and therefore
-   * you should only append to this vector or update things in-place without removing anything.
-   */
+    * @brief 存储回滚日志。其他回滚日志/表堆将存储(txn_id, 索引)对，因此
+    * 你应该仅向此向量追加内容或就地更新，而不是删除任何内容。
+    */
   std::vector<UndoLog> undo_logs_;
 
-  /** stores the RID of write tuples */
+  /** 存储写入元组的RID */
   std::unordered_map<table_oid_t, std::unordered_set<RID>> write_set_;
-  /** store all scan predicates */
+  /** 存储所有扫描谓词 */
   std::unordered_map<table_oid_t, std::vector<AbstractExpressionRef>> scan_predicates_;
 
-  // The below fields are set when a txn is created and will NEVER be changed.
+  // 以下字段在创建事务时设置，并且永远不会更改。
 
-  /** The isolation level of the transaction. */
+  /** 事务的隔离级别 */
   const IsolationLevel isolation_level_;
 
-  /** The thread ID which the txn starts from.  */
+  /** 事务开始时的线程ID */
   const std::thread::id thread_id_;
 
-  /** The ID of this transaction. */
+  /** 此事务的ID */
   const txn_id_t txn_id_;
 };
 
@@ -211,7 +210,7 @@ class Transaction {
 
 template <>
 struct fmt::formatter<bustub::IsolationLevel> : formatter<std::string_view> {
-  // parse is inherited from formatter<string_view>.
+  // parse 从formatter<string_view>继承。
   template <typename FormatContext>
   auto format(bustub::IsolationLevel x, FormatContext &ctx) const {
     using bustub::IsolationLevel;
@@ -233,7 +232,7 @@ struct fmt::formatter<bustub::IsolationLevel> : formatter<std::string_view> {
 
 template <>
 struct fmt::formatter<bustub::TransactionState> : formatter<std::string_view> {
-  // parse is inherited from formatter<string_view>.
+  // parse 从formatter<string_view>继承。
   template <typename FormatContext>
   auto format(bustub::TransactionState x, FormatContext &ctx) const {
     using bustub::TransactionState;
@@ -254,4 +253,4 @@ struct fmt::formatter<bustub::TransactionState> : formatter<std::string_view> {
     }
     return formatter<string_view>::format(name, ctx);
   }
-};
+};  
