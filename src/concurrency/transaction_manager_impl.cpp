@@ -93,6 +93,9 @@ auto TransactionManager::GetUndoLink(RID rid) -> std::optional<UndoLink> {
   return std::nullopt;
 }
 
+// 1、通过这个linknode获得prev_txn_id
+// 2、利用txn_mgr的txn_map找到iter
+// 3、如果iter存在，则可以找到对应的txn，进而找到
 auto TransactionManager::GetUndoLogOptional(UndoLink link) -> std::optional<UndoLog> {
   std::shared_lock<std::shared_mutex> lck(txn_map_mutex_);
   auto iter = txn_map_.find(link.prev_txn_);

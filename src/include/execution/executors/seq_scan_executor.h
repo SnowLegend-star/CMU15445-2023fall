@@ -21,6 +21,7 @@
 #include "execution/plans/seq_scan_plan.h"
 #include "storage/table/table_heap.h"
 #include "storage/table/tuple.h"
+#include "concurrency/transaction_manager.h"
 
 namespace bustub {
 
@@ -53,9 +54,9 @@ class SeqScanExecutor : public AbstractExecutor {
  private:
   /** 要执行的顺序扫描计划节点 */
   const SeqScanPlanNode *plan_;
-  TableInfo *table_info_;
-  TableHeap *table_heap_;
+  // TableInfo *table_info_;
+  // TableHeap *table_heap_;
   std::vector<RID> rids_;
-  std::vector<bustub::RID>::iterator iter_start_;
+  std::unique_ptr<TableIterator> iter_;
 };
 }  // namespace bustub

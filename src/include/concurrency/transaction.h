@@ -67,9 +67,11 @@ struct UndoLink {
   friend auto operator!=(const UndoLink &a, const UndoLink &b) { return !(a == b); }
 
   /* 检查回滚链接是否有效 */
+  /* 如果无效, 说明已经指向链表尾部的占位符了 */
   auto IsValid() const -> bool { return prev_txn_ != INVALID_TXN_ID; }
 };
 
+// Txn的Undolog从新版本指向旧版本
 struct UndoLog {
   /* 此日志是否为删除标记 */
   bool is_deleted_;
@@ -78,6 +80,7 @@ struct UndoLog {
   /* 被修改的字段 */
   Tuple tuple_;
   /* 此回滚日志的时间戳 */
+  /* 应该是写入的时间戳 */
   timestamp_t ts_{INVALID_TS};
   /* 回滚日志的前一个版本 */
   UndoLink prev_version_{};

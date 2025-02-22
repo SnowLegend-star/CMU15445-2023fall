@@ -93,6 +93,7 @@ auto Tuple::GetDataPtr(const Schema *schema, const uint32_t column_idx) const ->
   return (data_.data() + offset);
 }
 
+// 将tuple的内容转化为数组打印出来
 auto Tuple::ToString(const Schema *schema) const -> std::string {
   std::stringstream os;
 

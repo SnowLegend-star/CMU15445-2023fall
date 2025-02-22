@@ -93,6 +93,7 @@ class TransactionManager {
                          std::function<bool(std::optional<VersionUndoLink>)> &&check = nullptr) -> bool;
 
   /** @brief 获取表堆元组的第一个回滚日志。任务4.2之前使用 */
+  /** 第一个日志就是最老的那个 **/
   auto GetUndoLink(RID rid) -> std::optional<UndoLink>;
 
   /** @brief 获取表堆元组的第一个回滚日志。任务4.2之后使用 */

@@ -5,7 +5,7 @@ namespace bustub {
 
 // NOLINTBEGIN(bugprone-unchecked-optional-access)
 
-TEST(TxnScanTest, DISABLED_TupleReconstructTest) {  // NOLINT
+TEST(TxnScanTest, TupleReconstructTest) {  // NOLINT
   auto schema = ParseCreateStatement("a integer,b double,c boolean");
   {
     fmt::println(stderr, "A: only base tuple");
@@ -103,7 +103,7 @@ TEST(TxnScanTest, DISABLED_TupleReconstructTest) {  // NOLINT
   }
 }
 
-TEST(TxnScanTest, DISABLED_ScanTest) {  // NOLINT
+TEST(TxnScanTest, ScanTest) {  // NOLINT
   auto bustub = std::make_unique<BustubInstance>();
   auto schema = ParseCreateStatement("a integer,b double,c boolean");
   auto modify_schema = ParseCreateStatement("a integer");
@@ -205,6 +205,7 @@ TEST(TxnScanTest, DISABLED_ScanTest) {  // NOLINT
   fmt::println(stderr, "A: Verify txn0");
   WithTxn(txn0, QueryShowResult(*bustub, _var, _txn, query, AnyResult{}));
   fmt::println(stderr, "B: Verify txn1");
+  // 可能有三种不同的执行结果
   WithTxn(txn1, QueryShowResult(*bustub, _var, _txn, query,
                                 AnyResult{
                                     {"2", "decimal_null", "boolean_null"},
@@ -212,22 +213,22 @@ TEST(TxnScanTest, DISABLED_ScanTest) {  // NOLINT
                                     {"7", "decimal_null", "boolean_null"},
                                 }));
 
-  // hidden tests... this is the only hidden test case among task 1, 2, 3. We recommend you to implement `TxnMgrDbg`
-  // function, draw the version chain out, and think of what should be read by each txn.
+  // 隐藏测试... 这是任务1、2、3中的唯一隐藏测试用例。我们建议你实现 `TxnMgrDbg`
+  // 函数，绘制版本链，并考虑每个事务应该读取的内容。
 
-  // though we don't have null and double / bool types in task 3 and onwards, we will test them in this test case.
-  // you should think about types other than integer, and think of the case where the user updates / inserts
-  // a column of null.
+  // 虽然在任务3及以后的版本中没有null、double或bool类型，但我们将在这个测试用例中进行测试。
+  // 你应该考虑除整数类型之外的其他类型，并思考用户更新或插入null列的情况。
 
-  // query = "SELECT a FROM maintable";
-  // fmt::println(stderr, "C: Verify txn2");
-  // WithTxn(txn2, QueryHideResult(*bustub, _var, _txn, query, IntResult{})); // <- you will need to fill in the answer
-  // fmt::println(stderr, "D: Verify txn3");
-  // WithTxn(txn3, QueryHideResult(*bustub, _var, _txn, query, IntResult{})); // <- you will need to fill in the answer
-  // fmt::println(stderr, "E: Verify txn4");
-  // WithTxn(txn4, QueryHideResult(*bustub, _var, _txn, query, IntResult{})); // <- you will need to fill in the answer
-  // fmt::println(stderr, "F: Verify txn5");
-  // WithTxn(txn5, QueryHideResult(*bustub, _var, _txn, query, IntResult{})); // <- you will need to fill in the answer
+  // 查询 = "SELECT a FROM maintable";
+  // fmt::println(stderr, "C: 验证 txn2");
+  // WithTxn(txn2, QueryHideResult(*bustub, _var, _txn, query, IntResult{})); // <- 你需要填写答案
+  // fmt::println(stderr, "D: 验证 txn3");
+  // WithTxn(txn3, QueryHideResult(*bustub, _var, _txn, query, IntResult{})); // <- 你需要填写答案
+  // fmt::println(stderr, "E: 验证 txn4");
+  // WithTxn(txn4, QueryHideResult(*bustub, _var, _txn, query, IntResult{})); // <- 你需要填写答案
+  // fmt::println(stderr, "F: 验证 txn5");
+  // WithTxn(txn5, QueryHideResult(*bustub, _var, _txn, query, IntResult{})); // <- 你需要填写答案
+
 }
 
 // NOLINTEND(bugprone-unchecked-optional-access))
