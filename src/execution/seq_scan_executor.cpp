@@ -12,6 +12,7 @@
 
 #include "execution/executors/seq_scan_executor.h"
 #include <vector>
+#include "common/config.h"
 #include "common/rid.h"
 #include "concurrency/transaction.h"
 #include "execution/execution_common.h"
@@ -50,7 +51,7 @@ auto SeqScanExecutor::Next(Tuple *tuple, RID *rid) -> bool {
         continue;
       }
     }
-    // case 3；要读的时间戳大于当前的读时间戳，需要使用undo日志改变tuple
+    // case 3；要读的时间戳大于当前的读时间戳，需要使用undo日志改变tuple  cur_ts=1时，就不能读tuple(ts=2)时的内容
     else {
       std::vector<UndoLog> undo_logs;
       auto undo_link_opt = exec_ctx_->GetTransactionManager()->GetUndoLink(temp_tuple.GetRid());
@@ -72,6 +73,8 @@ auto SeqScanExecutor::Next(Tuple *tuple, RID *rid) -> bool {
           // 在情况三中，如果遍历了所有undo日志，发现最终的ts仍然比read_ts大，则代表这个tuple不可读
           continue;
         }
+      }else{
+        continue;
       }
       auto reconstructed_tuple = ReconstructTuple(&GetOutputSchema(), temp_tuple, meta, undo_logs);
       if (!reconstructed_tuple.has_value()) {

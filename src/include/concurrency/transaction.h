@@ -84,6 +84,8 @@ struct UndoLog {
   timestamp_t ts_{INVALID_TS};
   /* 回滚日志的前一个版本 */
   UndoLink prev_version_{};
+  /** 这个日志是否为base_tuple**/
+  bool is_base_{false};
 };
 
 /**
@@ -161,13 +163,23 @@ class Transaction {
     return undo_logs_.size();
   }
 
-  /** 在排行榜基准测试中为在线垃圾回收使用此函数。对于停止世界垃圾回收，只需从txn_map中移除事务。 */
+  /** 在排行榜基准测试中为在线垃圾回收使用此函数。对于停world garbage collection，只需从txn_map中移除事务。 */
   inline auto ClearUndoLog() -> size_t {
     std::scoped_lock<std::mutex> lck(latch_);
     return undo_logs_.size();
   }
 
   void SetTainted();
+
+  /** 获得is_insert状态**/
+  auto GetInsertState()->bool{
+    return is_insert_;
+  }
+
+  /** 修改is_insert状态**/
+  void UpdateInsertState(){
+    is_insert_=true;
+  }
 
   private:
   friend class TransactionManager;
@@ -207,6 +219,9 @@ class Transaction {
 
   /** 此事务的ID */
   const txn_id_t txn_id_;
+
+  /* 这个事务是不是Insert状态 */
+  bool is_insert_{false};
 };
 
 }  // namespace bustub

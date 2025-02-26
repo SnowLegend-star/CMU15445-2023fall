@@ -10,6 +10,7 @@
 #include "common/config.h"
 #include "common/macros.h"
 #include "common/rid.h"
+#include "concurrency/transaction.h"
 #include "concurrency/transaction_manager.h"
 #include "fmt/core.h"
 #include "storage/table/table_heap.h"
@@ -18,6 +19,19 @@
 #include "type/value_factory.h"
 
 namespace bustub {
+
+auto IsWriteWriteConflict()->bool{
+  return true;
+}
+
+auto GetModifiedField(TransactionManager txn_mgr,Transaction txn,UndoLog &cur_undolog,Schema &schema)->std::vector<bool>{
+  std::vector<bool> modified_field;
+  auto txn_id=cur_undolog.prev_version_.prev_txn_;
+  auto prev_undolog_txn=txn_mgr.txn_map_[txn_id];
+  auto prev_undolog_idx=cur_undolog.prev_version_.prev_log_idx_;
+  auto base_tuple=prev_undolog_txn->GetUndoLog(prev_undolog_idx).tuple_;
+  return modified_field;
+}
 
 auto GetUndoLogSchema(const Schema *base_schema, const std::vector<bool> &modified_fields)->Schema{
   auto col_cnt=base_schema->GetColumnCount();
@@ -122,7 +136,7 @@ void TxnMgrDbg(const std::string &info, TransactionManager *txn_mgr, const Table
     // 这个ts可能是临时的TXN_START_ID + txn_human_readable_id = txn_id, 有可能是已经完成提交的
     auto ts=iter.GetTuple().first.ts_;
     auto ts_real=ts>TXN_START_ID?"txn"+std::to_string(ts-TXN_START_ID):std::to_string(ts);
-    fmt::println(stderr,"RID={}/{} ts={} tuple={}",tmp_rid.GetPageId(),tmp_rid.GetSlotNum(),ts_real,tmp_tuple.ToString(&table_info->schema_));
+    fmt::println(stderr,"RID={}/{} ts={} Del={} tuple={}",tmp_rid.GetPageId(),tmp_rid.GetSlotNum(),ts_real,iter.GetTuple().first.is_deleted_,tmp_tuple.ToString(&table_info->schema_));
     // fmt::println("这个元组的undoLog如下:");
 
     while (undo_link->IsValid()) {

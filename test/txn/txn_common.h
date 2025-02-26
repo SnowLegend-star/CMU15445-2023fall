@@ -406,7 +406,7 @@ void EnsureTxnGCed(BustubInstance &instance, const std::string &txn_var_name, tx
                txn_id ^ TXN_START_ID, instance.txn_manager_->GetWatermark());
   const auto &txn_map = instance.txn_manager_->txn_map_;
   if (txn_map.find(txn_id) != txn_map.end()) {
-    std::cerr << "txn not garbage collected" << std::endl;
+    std::cerr << "txn: "<<txn_id<< "not garbage collected" << std::endl;
     std::terminate();
   }
 }
@@ -416,7 +416,7 @@ void EnsureTxnExists(BustubInstance &instance, const std::string &txn_var_name, 
                txn_id ^ TXN_START_ID, instance.txn_manager_->GetWatermark());
   const auto &txn_map = instance.txn_manager_->txn_map_;
   if (txn_map.find(txn_id) == txn_map.end()) {
-    std::cerr << "txn not exist" << std::endl;
+    std::cerr << "txn:"<<txn_id<<"not exist" << std::endl;
     std::terminate();
   }
 }

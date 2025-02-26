@@ -363,6 +363,8 @@ class Catalog {
     return indexes;
   }
 
+  // 获得所有table的名称
+  // 你的、你的名字是...?!!
   auto GetTableNames() -> std::vector<std::string> {
     std::vector<std::string> result;
     for (const auto &x : table_names_) {

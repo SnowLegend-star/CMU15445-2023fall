@@ -6,6 +6,7 @@
 #include "catalog/catalog.h"
 #include "catalog/schema.h"
 #include "concurrency/transaction.h"
+#include "concurrency/transaction_manager.h"
 #include "storage/table/tuple.h"
 
 namespace bustub {
@@ -35,4 +36,10 @@ void TxnMgrDbg(const std::string &info, TransactionManager *txn_mgr, const Table
 
 // 获得undoLog的schema
 auto GetUndoLogSchema(const Schema *base_schema,const std::vector<bool>& modified_fields) ->Schema;
+
+// 检测是否可能存在写冲突
+auto IsWriteWriteConflict() ->bool;
+
+// 得到这个update的上一个已提交tuple
+auto GetModifiedField(TransactionManager txn_mgr,Transaction txn,UndoLog &cur_undolog,Schema &schema)->std::vector<bool>;
 }  // namespace bustub

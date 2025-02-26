@@ -42,6 +42,7 @@ auto TransactionManager::UpdateVersionLink(RID rid, std::optional<VersionUndoLin
                                            std::function<bool(std::optional<VersionUndoLink>)> &&check) -> bool {
   std::unique_lock<std::shared_mutex> lck(version_info_mutex_);
   std::shared_ptr<PageVersionInfo> pg_ver_info = nullptr;
+  // 1、查找该页面的 PageVersionInfo
   auto iter = version_info_.find(rid.GetPageId());
   if (iter == version_info_.end()) {
     pg_ver_info = std::make_shared<PageVersionInfo>();
@@ -51,6 +52,7 @@ auto TransactionManager::UpdateVersionLink(RID rid, std::optional<VersionUndoLin
   }
   std::unique_lock<std::shared_mutex> lck2(pg_ver_info->mutex_);
   lck.unlock();
+  // 2、在当前page中，查找这个slot对应的undo_log
   auto iter2 = pg_ver_info->prev_version_.find(rid.GetSlotNum());
   if (iter2 == pg_ver_info->prev_version_.end()) {
     if (check != nullptr && !check(std::nullopt)) {
@@ -78,7 +80,7 @@ auto TransactionManager::GetVersionLink(RID rid) -> std::optional<VersionUndoLin
   std::shared_ptr<PageVersionInfo> pg_ver_info = iter->second;
   std::unique_lock<std::shared_mutex> lck2(pg_ver_info->mutex_);
   lck.unlock();
-  auto iter2 = pg_ver_info->prev_version_.find(rid.GetSlotNum());
+  auto iter2 = pg_ver_info->prev_version_.find(rid.GetSlotNum()); // 在当前page中找对应slotNum的undolink
   if (iter2 == pg_ver_info->prev_version_.end()) {
     return std::nullopt;
   }
