@@ -28,7 +28,7 @@ void ExtendibleHTableHeaderPage::Init(uint32_t max_depth) {
 }
 
 // 有点不理解这个函数的意思
-// 就是取hash的高max_depth位，一共有2^max_depth个目录
+// 就是取hash的高max_depth位，一共有2^max_depth个dir目录
 auto ExtendibleHTableHeaderPage::HashToDirectoryIndex(uint32_t hash) const -> uint32_t {
   if (max_depth_ == 0) {
     return 0;

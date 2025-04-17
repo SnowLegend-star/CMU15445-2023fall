@@ -1,0 +1,17 @@
+/*
+
+BufferPoolManager::WritePage(page_id, data)
+    ↓
+DiskManagerProxy::WritePage(page_id, data)
+    ↓
+DiskWriteRequestQueue[page_id].Push(req)
+    ↓
+等待自己成为队头
+    ↓
+启动后台线程写磁盘
+    ↓
+写完 -> PopFront() -> 唤醒下一个请求
+
+*/
+
+

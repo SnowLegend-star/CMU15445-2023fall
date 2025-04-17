@@ -23,6 +23,7 @@
 #include "storage/disk/disk_scheduler.h"
 #include "storage/page/page.h"
 #include "storage/page/page_guard.h"
+#include "dlc.h"
 
 namespace bustub {
 
@@ -186,6 +187,8 @@ class BufferPoolManager {
   /** This latch protects shared data structures. We recommend updating this comment to describe what it protects. */
   std::mutex latch_;
 
+  std::unique_ptr<DiskManagerProxy> disk_manager_proxy_; // 使用DiskManagerProxy代替原来的DiskScheduler
+
   /**
    * @brief 在磁盘上分配一个页面。调用者应该在调用此函数之前获取锁。
    * @return 分配的页面 ID
@@ -202,4 +205,7 @@ class BufferPoolManager {
 
   // TODO(student): You may add additional private members and helper functions
 };
+
+
+
 }  // namespace bustub

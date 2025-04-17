@@ -193,7 +193,10 @@ auto main(int argc, char **argv) -> int {
   if (program.present("--lru-k-size")) {
     lru_k_size = std::stoi(program.get("--lru-k-size"));
   }
-
+  /*
+  DiskManagerUnlimitedMemory ≈ 把整库放内存里，
+  可选择 EnableLatencySimulator() 来给磁盘操作人工注入 delay（近似硬盘 / SSD 延迟）。
+  */
   auto disk_manager = std::make_unique<DiskManagerUnlimitedMemory>();
   auto bpm = std::make_unique<BufferPoolManager>(bustub_bpm_size, disk_manager.get(), lru_k_size);
   std::vector<page_id_t> page_ids;
